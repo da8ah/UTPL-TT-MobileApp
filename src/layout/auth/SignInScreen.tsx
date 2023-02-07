@@ -13,9 +13,8 @@ const styles = StyleSheet.create({
 	},
 	container: { flex: 1 },
 	header: {
+		backgroundColor: "black",
 		flex: 1,
-		backgroundColor: "tomato",
-		color: "white",
 		paddingVertical: 20,
 		marginTop: 30,
 		borderTopLeftRadius: 20,
@@ -55,9 +54,11 @@ const SignInHeader = () => (
 		<Text category='h5' style={{ color: "white", fontFamily: "serif" }}>
 			¡Bienvenidos!
 		</Text>
-		<Text category="h1" status="basic" style={{ fontStyle: "italic" }}>
-			BOOKSTORE
-		</Text>
+		<Layout style={{ backgroundColor: "transparent", width: "100%", flexDirection: "row", justifyContent: "space-evenly" }}>
+			<Text category="h1" status="info" style={{ fontStyle: "italic" }}>
+				BOOKSTORE
+			</Text>
+		</Layout>
 	</Layout>
 );
 
@@ -122,7 +123,7 @@ const SignInBody = () => {
 				<Layout style={styles.buttonLayout}>
 					<Button
 						style={styles.button}
-						status="danger"
+						status="info"
 						accessoryRight={ButtonIcon}
 						onPress={async () => {
 							// await adminViMo.login(new Admin(user?.trim(), undefined, undefined, undefined, password));

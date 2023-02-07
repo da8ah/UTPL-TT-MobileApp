@@ -62,7 +62,7 @@ const ProfileScreen = () => {
 	);
 
 	return (
-		<Layout style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", paddingTop: 40 }}>
+		<Layout style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", paddingTop: 35 }}>
 			<Layout>
 				<Icon name="person-outline" fill="black" height="100" width="100" />
 				<Text style={{ fontSize: 30, fontFamily: "serif", fontStyle: "italic", textAlign: "center", textTransform: "uppercase" }}>

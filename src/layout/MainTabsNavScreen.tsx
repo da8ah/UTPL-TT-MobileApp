@@ -17,14 +17,15 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 	},
 	header: {
-		flex: 3,
-		justifyContent: "flex-end",
-		paddingVertical: 20,
-		color: "white",
 		backgroundColor: "black",
+		color: "white",
+		flex: 3,
+		justifyContent: "center",
+		paddingVertical: 20,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
 	},
 	body: {
-		backgroundColor: "blue",
 		flex: 20,
 		justifyContent: "center",
 		alignContent: "center",
@@ -60,10 +61,10 @@ const MainTabsNavScreen = () => {
 	);
 
 	return (
-		<Layout style={{ flex: 1 }}>
+		<Layout style={{ flex: 1, paddingTop: 30 }}>
 			<Header presentBottomSheet={handlePresentModalPress} closeBottomSheet={handleCloseModalPress} />
 			<Body />
-			<BottomSheetModal ref={bottomSheetModalRef} index={0} snapPoints={["85%"]}>
+			<BottomSheetModal ref={bottomSheetModalRef} index={0} snapPoints={["80%"]}>
 				<CartScreen closeButton={<CloseBottomSheetButton />} />
 			</BottomSheetModal>
 		</Layout>
