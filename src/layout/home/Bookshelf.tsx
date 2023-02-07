@@ -13,26 +13,20 @@ const styles = StyleSheet.create({
 	},
 });
 
-const books = [new StockBook(), new StockBook(), new StockBook(), new StockBook(), new StockBook(), new StockBook()];
-
-const Bookshelf = () => (
+const Bookshelf = (props: { tag: string; identifier: string; books: StockBook[] }) => (
 	<Layout style={[styles.shelf]}>
 		<Layout>
-			<Text>Más vendidos</Text>
+			<Text style={{ fontWeight: "bold", fontStyle: "italic" }}>{props.tag}</Text>
 		</Layout>
 		<List
 			horizontal
 			scrollEnabled
-			// testID='listBooks'
-			// listKey={"books"}
-			// style={styles.mainListLayout}
+			listKey={props.identifier}
 			contentContainerStyle={styles.flatListLayout}
 			initialNumToRender={5}
-			data={books}
-			extraData={books}
+			data={props.books}
+			extraData={props.books}
 			renderItem={StockBookCard}
-			// refreshing={refreshing}
-			// onRefresh={queryDataFromServer}
 		/>
 	</Layout>
 );

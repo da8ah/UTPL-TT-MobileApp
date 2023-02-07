@@ -1,8 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
-import { Icon, Input, Text } from "@ui-kitten/components";
-import { Button } from "@ui-kitten/components";
-import { Modal } from "@ui-kitten/components";
-import { Layout } from "@ui-kitten/components";
+import { Button, Icon, Input, Layout, Modal, Text } from "@ui-kitten/components";
 import { useState } from "react";
 import { Image, ListRenderItem, ListRenderItemInfo, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import StockBook from "../../core/entities/StockBook";
@@ -15,45 +11,21 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		textAlign: "center",
 	},
-	mainLayout: {
-		backgroundColor: "black",
-		width: 120,
-		height: 200,
-		marginHorizontal: 2,
-	},
-	cardLayout: {
-		backgroundColor: "transparent",
-		height: 155,
-		paddingVertical: 2,
-		borderRadius: 7,
-	},
-	cardHeader: {
-		backgroundColor: "red",
+	mainLayout: { backgroundColor: transparent, width: 120, height: 200, marginHorizontal: 2 },
+	cardLayout: { backgroundColor: transparent, height: 170, borderRadius: 7 },
+	cardImage: { backgroundColor: "gainsboro", height: 120, justifyContent: "space-around", alignItems: "center", borderRadius: 10 },
+	cardBody: { backgroundColor: transparent, height: 50, paddingHorizontal: 2 },
+	image: { height: 120, resizeMode: "contain" },
+	price: {
+		backgroundColor: transparent,
 		width: "100%",
-		height: 15,
+		height: 20,
 		paddingHorizontal: 3,
 		flexDirection: "row",
 		justifyContent: "space-between",
-	},
-	cardBody: {
-		backgroundColor: "transparent",
-		width: "100%",
-		height: 100,
-		alignItems: "center",
-	},
-	cardFooter: {
-		backgroundColor: "transparent",
-		width: "100%",
-		height: 40,
-		paddingHorizontal: 2,
+		alignItems: "flex-start",
 	},
 	// icons: { width: "20%", justifyContent: "space-evenly" },
-	imageLayout: { width: "80%", height: 100, alignItems: "center" },
-	image: {
-		maxWidth: "80%",
-		height: 70,
-		resizeMode: "contain",
-	},
 
 	// bodyProperties: {
 	// 	backgroundColor: transparent,
@@ -61,111 +33,79 @@ const styles = StyleSheet.create({
 	// 	flexDirection: "row",
 	// 	justifyContent: "space-between",
 	// },
-	buttonLayout: {
-		backgroundColor: "darkgrey",
-		height: 45,
-	},
+	buttonLayout: { backgroundColor: transparent, height: 30 },
 	button: { width: "70%" },
 });
 
-const StockBookCard: ListRenderItem<StockBook> = (info: ListRenderItemInfo<StockBook>) => {
-	return (
-		<Layout style={styles.mainLayout}>
-			{/* Card */}
-			<Layout style={styles.cardLayout}>
-				<StockBookCardHeader />
-				<StockBookCardBody />
-				<StockBookCardFooter />
-			</Layout>
-			{/* Button */}
-			<StockBookCardButton itemIndex={info.index} />
+const StockBookCard: ListRenderItem<StockBook> = (info: ListRenderItemInfo<StockBook>) => (
+	<Layout style={styles.mainLayout}>
+		{/* Card */}
+		<Layout style={styles.cardLayout}>
+			<CardImage />
+			<CardBody />
 		</Layout>
-	);
-};
+		{/* Button */}
+		<CardButton itemIndex={info.index} />
+	</Layout>
+);
 
 export default StockBookCard;
 
-const StockBookCardHeader = () => {
-	const props = { isbn: "9876543212345", price: 25 };
+const CardImage = () => (
+	<Layout style={styles.cardImage}>
+		<Image style={styles.image} source={require("../../../assets/bookstore.png")} />
+	</Layout>
+);
 
-	return (
-		<Layout style={[styles.common, styles.cardHeader]}>
-			<Text style={{ fontSize: 10 }} adjustsFontSizeToFit={true}>
-				{props.isbn}
-			</Text>
-			<Text style={{ fontSize: 12.5 }} adjustsFontSizeToFit={true}>
-				{props.price ? props.price.toFixed(2) : "NaN"} 💲
-			</Text>
-		</Layout>
-	);
-};
-
-const StockBookCardBody = () => {
-	const props = { isInOffer: true, discountPercentage: 10 };
-
+const CardBody = () => {
+	const props = { title: "Historia de TOTORO", author: "HIRR SEBASTIAN", price: 25, isInOffer: true, discountPercentage: 10 };
 	return (
 		<Layout style={styles.cardBody}>
-			<Layout style={styles.imageLayout}>
-				<Text style={{ width: "100%", position: "absolute", zIndex: 1, color: "red", fontStyle: "italic", textAlign: "right" }}>
-					{props.isInOffer ? `-${props.discountPercentage}%` : ""}
+			<Layout style={{ backgroundColor: transparent, paddingVertical: 2 }}>
+				<ScrollView
+					horizontal
+					alwaysBounceHorizontal
+					style={{ height: 15 }}
+					showsHorizontalScrollIndicator={false}
+					showsVerticalScrollIndicator={false}
+					fadingEdgeLength={50}
+				>
+					<Text style={{ fontSize: 14, textAlignVertical: "top" }}>{props.title}</Text>
+				</ScrollView>
+				<Text style={{ width: "100%", height: 10, fontSize: 9, fontStyle: "italic" }} adjustsFontSizeToFit={true}>
+					{props.author}
 				</Text>
-				<Image style={styles.image} source={require("../../../assets/bookstore.png")} />
+			</Layout>
+			<Layout style={[styles.common, styles.price]}>
+				<Text style={{ color: "darkgreen", fontSize: 15 }} adjustsFontSizeToFit={true}>
+					{`💲${props.price ? props.price.toFixed(2) : "NaN"}`}
+				</Text>
+				<Text style={{ color: "red", fontSize: 13, fontStyle: "italic" }}>{props.isInOffer ? `-${props.discountPercentage}%` : ""}</Text>
 			</Layout>
 		</Layout>
 	);
 };
 
-const StockBookCardFooter = () => {
-	const props = { title: "Historia de TOTORO", author: "HIRR SEBASTIAN" };
-
-	return (
-		<Layout style={styles.cardFooter}>
-			<ScrollView
-				horizontal
-				alwaysBounceHorizontal
-				style={{ height: 20 }}
-				showsHorizontalScrollIndicator={false}
-				showsVerticalScrollIndicator={false}
-				fadingEdgeLength={50}
-			>
-				<Text style={{ fontStyle: "italic" }}>{props.title}</Text>
-			</ScrollView>
-			<ScrollView
-				horizontal
-				alwaysBounceHorizontal
-				style={{ height: 20 }}
-				showsHorizontalScrollIndicator={false}
-				showsVerticalScrollIndicator={false}
-				fadingEdgeLength={50}
-			>
-				<Text style={{ fontSize: 11 }} adjustsFontSizeToFit={true}>
-					{props.author}
-				</Text>
-			</ScrollView>
-		</Layout>
-	);
-};
-
-const ButtonIcon = () => <Icon name="plus-circle" fill="white" height="10" width="10" />;
-const StockBookCardButton = (props: { itemIndex: number }) => {
+const CardButton = (props: { itemIndex: number }) => {
 	const [modalVisibility, setModalVisibility] = useState(false);
 	const [modalChildren, setModalChildren] = useState<JSX.Element>();
 	const [cant, setCant] = useState("0");
 
+	const ButtonIcon = () => <Icon name="plus-circle" fill="white" height="10" width="10" />;
 	return (
 		<Layout style={[styles.common, styles.buttonLayout]}>
-			<Layout style={[styles.common, { backgroundColor: "red", flexDirection: "row", justifyContent: "space-evenly" }]}>
-				<Button style={styles.button} size="tiny" status="info" accessoryRight={ButtonIcon} onPress={() => {}}>
+			<Layout style={[styles.common, { backgroundColor: transparent, flexDirection: "row", justifyContent: "space-evenly" }]}>
+				<Button style={styles.button} size="tiny" status="primary" accessoryRight={ButtonIcon} onPress={() => {}}>
 					Agregar
 				</Button>
 				<TouchableOpacity
-					style={{ backgroundColor: "white", borderRadius: 100, paddingHorizontal: 10 }}
+					style={{ backgroundColor: "royalblue", height: 20, width: 20, borderRadius: 100, justifyContent: "center", alignItems: "center" }}
 					onPressIn={() => {
 						setModalChildren(<ModalCant cantUpdater={setCant} />);
 						setModalVisibility(true);
 					}}
 				>
-					<Text>1</Text>
+					<Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>1</Text>
 				</TouchableOpacity>
 			</Layout>
 			<Modal

@@ -10,11 +10,10 @@ const styles = StyleSheet.create({
 	},
 	// container: { flex: 1, paddingTop: 10, paddingHorizontal: 5 },
 	buttonLayout: { backgroundColor: "transparent", flexDirection: "row", justifyContent: "space-around", alignItems: "center" },
-	cardPropsRow: {
-		flexDirection: "row",
-	},
+	cardPropsRow: { backgroundColor: "transparent", flexDirection: "row" },
 	cardKeys: {
 		width: "40%",
+		fontSize: 10,
 		textTransform: "uppercase",
 	},
 	cardValues: {
@@ -24,12 +23,20 @@ const styles = StyleSheet.create({
 
 const ProfileScreen = () => {
 	const cuenta = {
-		user: "Tiber",
+		usuario: "Tiber",
 		nombre: "Danilo Ochoa Hidalgo",
 		email: "tiber@email.com",
 		móvil: "+593000000001",
 		clave: "********",
 	};
+	const cuentaChildren: JSX.Element[] = Object.entries(cuenta).map(([key, value], index) => (
+		<Layout key={`clientProp${index}`} style={styles.cardPropsRow}>
+			<Text style={styles.cardKeys} adjustsFontSizeToFit>
+				{key}
+			</Text>
+			<Text style={styles.cardValues}>{value}</Text>
+		</Layout>
+	));
 
 	const facturacion = {
 		Destinatario: "Danilo Ochoa Hidalgo",
@@ -39,42 +46,39 @@ const ProfileScreen = () => {
 		"Número de casa": "000",
 		Calles: "Principal y Secundaria",
 	};
+	const facturacionChildren: JSX.Element[] = Object.entries(facturacion).map(([key, value], index) => (
+		<Layout key={`billingInfoProp${index}`} style={styles.cardPropsRow}>
+			<Text style={styles.cardKeys} adjustsFontSizeToFit>
+				{key}
+			</Text>
+			<Text style={styles.cardValues}>{value}</Text>
+		</Layout>
+	));
 
-	const cuentaChildren: JSX.Element[] = Object.entries(cuenta).map(([key, value]) => {
-		return (
-			<Layout style={styles.cardPropsRow}>
-				<Text style={styles.cardKeys}>{key}</Text>
-				<Text style={styles.cardValues}>{value}</Text>
-			</Layout>
-		);
-	});
-	const facturacionChildren: JSX.Element[] = Object.entries(facturacion).map(([key, value]) => {
-		return (
-			<Layout style={styles.cardPropsRow}>
-				<Text style={styles.cardKeys}>{key}</Text>
-				<Text style={styles.cardValues}>{value}</Text>
-			</Layout>
-		);
-	});
-
-	const EditIcon = () => <Icon name="shopping-bag" fill="white" height="50" width="50" />;
-	const SlashIcon = () => <Icon name="credit-card" fill="white" height="50" width="50" />;
-	const SaveIcon = () => <Icon name="shopping-cart" fill="white" height="50" width="50" />;
-	const CardHeader = (props: { title: string }) => <Text>{props.title}</Text>;
+	const CardIcon = () => <Icon name="credit-card" fill="darkgrey" height="50" width="50" />;
+	const BagIcon = () => <Icon name="shopping-bag" fill="darkgrey" height="50" width="50" />;
+	const CardHeader = (props: { title: string }) => (
+		<Text style={{ backgroundColor: "black", color: "white", padding: 2, paddingLeft: 20 }}>{props.title}</Text>
+	);
 
 	return (
 		<Layout style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", paddingTop: 40 }}>
 			<Layout>
 				<Icon name="person-outline" fill="black" height="100" width="100" />
-				<Text style={{ fontSize: 30, fontFamily: "serif", fontStyle: "italic", textAlign: "center", textTransform: "uppercase" }}>{cuenta.user}</Text>
+				<Text style={{ fontSize: 30, fontFamily: "serif", fontStyle: "italic", textAlign: "center", textTransform: "uppercase" }}>
+					{cuenta.usuario}
+				</Text>
 			</Layout>
 			<Layout style={[styles.common, styles.buttonLayout]}>
-				<Button size="tiny" accessoryLeft={EditIcon} style={{ borderRadius: 100 }} />
-				<Button size="tiny" accessoryLeft={SlashIcon} style={{ borderRadius: 100 }} />
-				<Button size="tiny" accessoryLeft={SaveIcon} style={{ borderRadius: 100 }} />
+				<Button size="tiny" status="basic" accessoryLeft={CardIcon} style={{ borderRadius: 100 }} />
+				<Button size="tiny" status="basic" accessoryLeft={BagIcon} style={{ borderRadius: 100 }} />
 			</Layout>
-			<Card header={<CardHeader title="Cuenta" />}>{cuentaChildren}</Card>
-			<Card header={<CardHeader title="Facturación" />}>{facturacionChildren}</Card>
+			<Card key="client" header={<CardHeader title="Cuenta" />} style={{ width: "80%", borderRadius: 20 }}>
+				{cuentaChildren}
+			</Card>
+			<Card key="billingInfo" header={<CardHeader title="Facturación" />} style={{ width: "80%", borderRadius: 20 }}>
+				{facturacionChildren}
+			</Card>
 		</Layout>
 	);
 };
