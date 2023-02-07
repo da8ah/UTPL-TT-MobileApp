@@ -32,25 +32,19 @@ const BooksScreen = () => {
 
 	useEffect(() => {}, [books]);
 
-	const queryDataFromServer = () => {
+	const fetchData = () => {
 		setRefreshing(true);
 		setTimeout(async () => {
 			await booksViMo.getDataFromServer();
-			setBooks(booksViMo.getBooksStored());
 			setRefreshing(false);
 		}, 2000);
 	};
 
 	useEffect(() => {
-		queryDataFromServer();
 		booksViMo.attach(displayDataRetrieved);
+		fetchData();
 		return () => booksViMo.detach(displayDataRetrieved);
 	}, []);
-
-	// const bestSeller = retrievedBooks.map((book) => {
-	// 	if (book.isBestSeller()) return book;
-	// });
-	// this.bestSeller = bestSeller?.[0] !== undefined ? bestSeller : [new StockBook()];
 
 	return (
 		<Layout style={styles.body}>
@@ -68,7 +62,7 @@ const BooksScreen = () => {
 					extraData={books}
 					renderItem={StockBookCard}
 					refreshing={refreshing}
-					onRefresh={queryDataFromServer}
+					onRefresh={fetchData}
 				/>
 			</Layout>
 		</Layout>

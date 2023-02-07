@@ -22,9 +22,6 @@ const HomeScreen = () => {
 
 	const displayDataRetrieved: BooksObserver = (books: StockBook[]) => {
 		setBooks(books);
-	};
-
-	useEffect(() => {
 		const inOffer = books.filter((book) => {
 			if (book.isInOffer()) return book;
 		});
@@ -42,18 +39,19 @@ const HomeScreen = () => {
 		bestSeller?.[0] !== undefined ? setBestSeller(bestSeller) : [new StockBook()];
 		recommended?.[0] !== undefined ? setRecommended(recommended) : [new StockBook()];
 		recent?.[0] !== undefined ? setRecent(recent) : [new StockBook()];
-	}, [books]);
+	};
 
-	const queryDataFromServer = () => {
+	useEffect(() => {}, [books, inOffer, bestSeller, recommended, recent]);
+
+	const fetchData = () => {
 		setTimeout(async () => {
 			await booksViMo.getDataFromServer();
-			setBooks(booksViMo.getBooksStored());
 		}, 2000);
 	};
 
 	useEffect(() => {
-		queryDataFromServer();
 		booksViMo.attach(displayDataRetrieved);
+		fetchData();
 		return () => booksViMo.detach(displayDataRetrieved);
 	}, []);
 

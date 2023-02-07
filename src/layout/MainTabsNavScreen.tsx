@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { BottomNavigation, BottomNavigationTab, Button, Icon, Layout, Text } from "@ui-kitten/components";
 import React, { useCallback, useRef } from "react";
 import { StyleSheet } from "react-native";
+import clientViMo from "../viewmodel/ClientViMo";
 import CartScreen from "./cart/CartScreen";
 import BooksScreen from "./home/BooksScreen";
 import HomeScreen from "./home/HomeScreen";
@@ -91,7 +92,7 @@ const Header = (props: { presentBottomSheet: () => void; closeBottomSheet: () =>
 					style={{ borderRadius: 100 }}
 					onPress={() => {
 						props.closeBottomSheet();
-						navigation.navigate("Profile");
+						navigation.navigate(clientViMo.isAuth() ? "Profile" : "SignIn");
 					}}
 				/>
 				<Text category="h1" status="danger" style={{ fontStyle: "italic" }}>

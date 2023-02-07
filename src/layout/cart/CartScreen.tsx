@@ -6,6 +6,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { StyleSheet } from "react-native";
 import StockBook from "../../core/entities/StockBook";
 import ToBuyBook from "../../core/entities/ToBuyBook";
+import clientViMo from "../../viewmodel/ClientViMo";
 import { RootStackParamList } from "../NavigationTypes";
 import CartItem from "./CartItem";
 
@@ -47,6 +48,7 @@ const CartScreen = (props: { closeButton?: JSX.Element }) => {
 	const subtotal = 23.66;
 	const total = 200;
 
+	const ButtonIcon = () => <Icon name="settings-2-outline" fill="white" height="20" width="20" />;
 	// render
 	return (
 		<Layout style={{ flex: 1 }}>
@@ -93,8 +95,17 @@ const CartScreen = (props: { closeButton?: JSX.Element }) => {
 					// onRefresh={queryDataFromServer}
 				/>
 			</Layout>
-			<Button status="primary" style={styles.button}>
-				Procesar
+			<Button
+				size="large"
+				status="warning"
+				style={styles.button}
+				accessoryLeft={ButtonIcon}
+				onPress={() => {
+					// props.closeBottomSheet();
+					// navigation.navigate(clientViMo.isAuth() ? "Order" : "SignIn");
+				}}
+			>
+				PROCESAR
 			</Button>
 		</Layout>
 	);

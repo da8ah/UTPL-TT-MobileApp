@@ -1,6 +1,9 @@
+import { useNavigation } from "@react-navigation/native";
 import { Button, Card, Icon, Layout, Text } from "@ui-kitten/components";
 import { useState } from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
+import clientViMo from "../../viewmodel/ClientViMo";
+import { RootStackParamList } from "../NavigationTypes";
 
 const styles = StyleSheet.create({
 	common: {
@@ -22,6 +25,9 @@ const styles = StyleSheet.create({
 });
 
 const ProfileScreen = () => {
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const navigation: any = useNavigation<RootStackParamList>();
+
 	const cuenta = {
 		usuario: "Tiber",
 		nombre: "Danilo Ochoa Hidalgo",
@@ -60,6 +66,7 @@ const ProfileScreen = () => {
 	const CardHeader = (props: { title: string }) => (
 		<Text style={{ backgroundColor: "black", color: "white", padding: 2, paddingLeft: 20 }}>{props.title}</Text>
 	);
+	const ButtonIcon = () => <Icon name="log-out" fill="white" height="20" width="20" rotation={180} />;
 
 	return (
 		<Layout style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", paddingTop: 35 }}>
@@ -79,6 +86,20 @@ const ProfileScreen = () => {
 			<Card key="billingInfo" header={<CardHeader title="Facturación" />} style={{ width: "80%", borderRadius: 20 }}>
 				{facturacionChildren}
 			</Card>
+			<Layout style={[styles.common, { alignItems: "center" }]}>
+				<Button
+					style={{ width: "70%" }}
+					size="medium"
+					status="danger"
+					accessoryRight={ButtonIcon}
+					onPress={() => {
+						clientViMo.logout();
+						navigation.navigate("Home");
+					}}
+				>
+					Cerrar Sesión
+				</Button>
+			</Layout>
 		</Layout>
 	);
 };

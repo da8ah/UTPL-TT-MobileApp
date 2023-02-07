@@ -1,7 +1,11 @@
+import { useNavigation } from "@react-navigation/native";
 import { Button, Icon, Input, Layout, Text } from "@ui-kitten/components";
 import { TouchableWithoutFeedback } from "@ui-kitten/components/devsupport";
 import { useState } from "react";
 import { KeyboardAvoidingView, StyleSheet } from "react-native";
+import Client from "../../core/entities/Client";
+import clientViMo from "../../viewmodel/ClientViMo";
+import { RootStackParamList } from "../NavigationTypes";
 
 const transparent = "transparent";
 const styles = StyleSheet.create({
@@ -95,6 +99,8 @@ const InputWithPassword = (props: { setPassword: any }) => {
 
 const ButtonIcon = () => <Icon name="log-in" fill="white" height="20" width="20" />;
 const SignInBody = () => {
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const navigation: any = useNavigation<RootStackParamList>();
 	const [user, setUser] = useState<string>();
 	const [password, setPassword] = useState<string>();
 
@@ -126,8 +132,8 @@ const SignInBody = () => {
 						status="info"
 						accessoryRight={ButtonIcon}
 						onPress={async () => {
-							// await adminViMo.login(new Admin(user?.trim(), undefined, undefined, undefined, password));
-							// if (adminViMo.getAdmin()?.getUser() !== undefined) props.setAuth(true);
+							await clientViMo.login(new Client(user?.trim(), undefined, undefined, undefined, password));
+							navigation.navigate("Profile");
 						}}
 					>
 						INICIAR SESIÓN

@@ -1,27 +1,39 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import clientViMo, { AuthObserver } from "../viewmodel/ClientViMo";
 import SignInScreen from "./auth/SignInScreen";
 import MainTabsNavScreen from "./MainTabsNavScreen";
 import { RootStackParamList } from "./NavigationTypes";
 import ProfileScreen from "./user/ProfileScreen";
 
 const RootNavigator = () => {
-	const [isAuth, setAuth] = useState(true);
+	const [isAuth, setAuth] = useState<boolean>(false);
+	const [loginAttempts, setLoginAttempts] = useState(0);
+
+	const changeAuthState: AuthObserver = (authState: boolean) => {
+		setAuth(authState);
+	};
+
+	const tryLogin = async () => {
+		if (loginAttempts < 2) await clientViMo.login();
+	};
+
+	useEffect(() => {
+		clientViMo.attachAuth(changeAuthState);
+		setLoginAttempts(1);
+		tryLogin();
+		setTimeout(async () => {
+			if (!isAuth) tryLogin();
+			setLoginAttempts(2);
+		}, 2000);
+		return () => clientViMo.detachAuth();
+	}, []);
 
 	const Stack = createNativeStackNavigator<RootStackParamList>();
 	return (
 		<NavigationContainer>
-			<Stack.Navigator
-				initialRouteName="Home"
-				screenOptions={{
-					headerShown: false,
-					presentation: "modal",
-					gestureEnabled: true,
-					gestureDirection: "vertical",
-					animationTypeForReplace: "pop",
-				}}
-			>
+			<Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
 				<Stack.Group>
 					<Stack.Screen name="Main" component={MainTabsNavScreen} />
 				</Stack.Group>
@@ -33,9 +45,9 @@ const RootNavigator = () => {
 				) : (
 					<Stack.Group>
 						<Stack.Screen name="SignIn" component={SignInScreen} />
-						{/* <Stack.Screen name="SignUp" component={SignUpScreen} /> */}
 					</Stack.Group>
 				)}
+				{/* <Stack.Screen name="SignUp" component={SignUpScreen} /> */}
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
