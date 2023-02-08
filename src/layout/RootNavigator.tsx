@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
 import clientViMo, { AuthObserver } from "../viewmodel/ClientViMo";
 import SignInScreen from "./auth/SignInScreen";
+import SignUpScreen from "./auth/SignUpScreen";
 import MainTabsNavScreen from "./MainTabsNavScreen";
 import { RootStackParamList } from "./NavigationTypes";
 import ProfileScreen from "./user/ProfileScreen";
@@ -45,9 +46,9 @@ const RootNavigator = () => {
 				) : (
 					<Stack.Group>
 						<Stack.Screen name="SignIn" component={SignInScreen} />
+						<Stack.Screen name="SignUp" component={SignUpScreen} options={{ animation: "slide_from_right" }} />
 					</Stack.Group>
 				)}
-				{/* <Stack.Screen name="SignUp" component={SignUpScreen} /> */}
 			</Stack.Navigator>
 		</NavigationContainer>
 	);

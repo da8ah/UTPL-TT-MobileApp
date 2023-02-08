@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
 const Bookshelf = (props: { tag: string; identifier: string; books: StockBook[] }) => (
 	<Layout style={[styles.shelf]}>
 		<Layout>
-			<Text style={{ fontWeight: "bold", fontStyle: "italic" }}>{props.tag}</Text>
+			<Text style={{ paddingLeft: 20, fontWeight: "bold", fontStyle: "italic" }}>{props.tag}</Text>
 		</Layout>
 		<List
 			horizontal

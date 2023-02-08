@@ -10,7 +10,8 @@ export class BooksViMo {
 	private books: StockBook[] = [];
 
 	public attach(observer: BooksObserver) {
-		this.observers?.push(observer);
+		if (!this.observers) this.observers = [];
+		this.observers.push(observer);
 	}
 
 	public detach(observer: BooksObserver) {
@@ -20,20 +21,18 @@ export class BooksViMo {
 				this.observers?.splice(0, spliceIndex - 1),
 				this.observers?.splice(spliceIndex, this.observers?.length),
 			);
-
 			if (observers !== undefined) this.observers = observers;
 		}
-	}
-
-	public async updateBooks() {
-		await this.getDataFromServer();
-		if (this.observers && this.books) this.observers.forEach((observer) => observer(this.books));
 	}
 
 	public async getDataFromServer() {
 		let retrievedBooks = null;
 		if (this.repository) retrievedBooks = await GestionDeInicio.listarCatalogoDeLibros(this.repository);
 		if (retrievedBooks) this.books = retrievedBooks;
+		if (this.observers && this.books)
+			this.observers.forEach((observer) => {
+				if (observer) observer(this.books);
+			});
 	}
 
 	public getBooksStored(): StockBook[] {

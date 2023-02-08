@@ -1,14 +1,22 @@
 import serverDataSource, { ServerDataSource } from "../core/data/ServerDataSource";
+import BillingInfo from "../core/entities/BillingInfo";
 import Client from "../core/entities/Client";
 import GestionDeCuentaClient from "../core/usecases/client/GestionDeCuentaClient";
 
-export type ClientObserver = (authState: boolean) => void;
+export type AuthObserver = (authState: boolean) => void;
+export type ProfileObserver = (client: Client) => void;
 class ClientViMo {
-	private observer: ClientObserver | null = null;
+	private authObserver: AuthObserver | null = null;
+	private profileObserver: ProfileObserver | null = null;
 	private repository: ServerDataSource | null = serverDataSource;
 	private client: Client = new Client();
-	private jwt: string | null = null;
 
+	private auth = false;
+	public isAuth(): boolean {
+		return this.auth;
+	}
+
+	private jwt: string | null = null;
 	public getJWT() {
 		return this.jwt;
 	}
@@ -17,11 +25,11 @@ class ClientViMo {
 		return this.client;
 	}
 
-	public attach(observer: ClientObserver) {
-		this.observer = observer;
+	public attachAuth(observer: AuthObserver) {
+		this.authObserver = observer;
 	}
-	public detach() {
-		this.observer = null;
+	public detachAuth() {
+		this.authObserver = null;
 	}
 
 	public async login(ClientToSearch?: Client) {
@@ -29,6 +37,8 @@ class ClientViMo {
 		if (this.repository) credenciales = await GestionDeCuentaClient.iniciarSesion(ClientToSearch || new Client(), this.repository);
 		if (credenciales?.token) this.jwt = credenciales.token;
 		if (credenciales?.client) this.client = credenciales.client;
+		if (this.jwt && this.client) this.auth = true;
+		if (this.authObserver) this.authObserver(this.auth);
 	}
 
 	public async logout() {
@@ -39,9 +49,12 @@ class ClientViMo {
 			this.client.setEmail("");
 			this.client.setMobile("");
 			this.client.setPassword("");
+			this.client.setBillingInfo(new BillingInfo());
 			this.client = new Client();
 		}
-		if (this.observer) this.observer(false);
+		if (this.jwt) this.jwt = null;
+		this.auth = false;
+		if (this.authObserver) this.authObserver(this.auth);
 	}
 }
 

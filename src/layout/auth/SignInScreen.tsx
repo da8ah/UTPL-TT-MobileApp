@@ -21,8 +21,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingVertical: 20,
 		marginTop: 30,
-		borderTopLeftRadius: 20,
-		borderTopRightRadius: 20,
 	},
 	body: { flex: 8, justifyContent: "flex-start", paddingTop: 20 },
 	imageLayout: { backgroundColor: transparent, alignContent: "center" },
@@ -53,18 +51,35 @@ const SignInScreen = () => (
 
 export default SignInScreen;
 
-const SignInHeader = () => (
-	<Layout style={[styles.common, styles.header]}>
-		<Text category='h5' style={{ color: "white", fontFamily: "serif" }}>
-			¡Bienvenidos!
-		</Text>
-		<Layout style={{ backgroundColor: "transparent", width: "100%", flexDirection: "row", justifyContent: "space-evenly" }}>
-			<Text category="h1" status="info" style={{ fontStyle: "italic" }}>
-				BOOKSTORE
+const SignInHeader = () => {
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const navigation: any = useNavigation<RootStackParamList>();
+
+	const CloseIcon = () => <Icon name="close" fill="white" height="30" width="30" />;
+	const PlusIcon = () => <Icon name="plus" fill="white" height="30" width="30" />;
+	return (
+		<Layout style={[styles.common, styles.header]}>
+			<Text category='h5' style={{ color: "white", fontFamily: "serif" }}>
+				Ingresa a tu Cuenta
 			</Text>
+			<Layout style={{ backgroundColor: "transparent", width: "100%", flexDirection: "row", justifyContent: "space-evenly" }}>
+				<Button
+					size="small"
+					status="danger"
+					accessoryLeft={CloseIcon}
+					style={{ borderRadius: 100 }}
+					onPress={() => {
+						navigation.goBack();
+					}}
+				/>
+				<Text category="h1" status="info" style={{ fontStyle: "italic" }}>
+					BOOKSTORE
+				</Text>
+				<Button size="small" status="info" accessoryLeft={PlusIcon} style={{ borderRadius: 100 }} onPress={() => navigation.navigate("SignUp")} />
+			</Layout>
 		</Layout>
-	</Layout>
-);
+	);
+};
 
 // rome-ignore lint/suspicious/noExplicitAny: <explanation>
 const InputWithPassword = (props: { setPassword: any }) => {
@@ -133,7 +148,7 @@ const SignInBody = () => {
 						accessoryRight={ButtonIcon}
 						onPress={async () => {
 							await clientViMo.login(new Client(user?.trim(), undefined, undefined, undefined, password));
-							navigation.navigate("Profile");
+							if (clientViMo.isAuth()) navigation.navigate("Profile");
 						}}
 					>
 						INICIAR SESIÓN

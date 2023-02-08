@@ -27,12 +27,13 @@ const styles = StyleSheet.create({
 const ProfileScreen = () => {
 	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	const navigation: any = useNavigation<RootStackParamList>();
+	const client = clientViMo.getClient();
 
 	const cuenta = {
-		usuario: "Tiber",
-		nombre: "Danilo Ochoa Hidalgo",
-		email: "tiber@email.com",
-		móvil: "+593000000001",
+		usuario: client.getUser(),
+		nombre: client.getName(),
+		email: client.getEmail(),
+		móvil: client.getMobile(),
 		clave: "********",
 	};
 	const cuentaChildren: JSX.Element[] = Object.entries(cuenta).map(([key, value], index) => (
@@ -45,12 +46,12 @@ const ProfileScreen = () => {
 	));
 
 	const facturacion = {
-		Destinatario: "Danilo Ochoa Hidalgo",
-		CI: "1000000001",
-		Provincia: "Loja",
-		Ciudad: "Loja",
-		"Número de casa": "000",
-		Calles: "Principal y Secundaria",
+		Destinatario: client.getBillingInfo()?.getToWhom(),
+		CI: client.getBillingInfo()?.getCi(),
+		Provincia: client.getBillingInfo()?.getProvincia(),
+		Ciudad: client.getBillingInfo()?.getCiudad(),
+		"Número de casa": client.getBillingInfo()?.getNumCasa(),
+		Calles: client.getBillingInfo()?.getCalles(),
 	};
 	const facturacionChildren: JSX.Element[] = Object.entries(facturacion).map(([key, value], index) => (
 		<Layout key={`billingInfoProp${index}`} style={styles.cardPropsRow}>

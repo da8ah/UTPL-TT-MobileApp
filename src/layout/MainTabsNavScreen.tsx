@@ -23,8 +23,6 @@ const styles = StyleSheet.create({
 		flex: 3,
 		justifyContent: "center",
 		paddingVertical: 20,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
 	},
 	body: {
 		flex: 20,
