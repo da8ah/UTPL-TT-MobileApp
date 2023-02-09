@@ -122,7 +122,6 @@ const UiKittenBottomTabNav = ({ navigation, state }: BottomTabBarProps) => {
 	const BooksTitle = () => <Text style={{ color: "black", fontSize: 10 }}>Biblioteca</Text>;
 	return (
 		<BottomNavigation
-			// testID='navigation'
 			style={{ height: "7%" }}
 			indicatorStyle={{ backgroundColor: "black", borderWidth: 0.1 }}
 			selectedIndex={state.index}

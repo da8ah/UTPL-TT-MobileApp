@@ -1,6 +1,3 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import HandleProps from "@gorhom/bottom-sheet";
-
 export type RootStackParamList = {
 	Main: undefined;
 	Home: undefined;
@@ -10,5 +7,3 @@ export type RootStackParamList = {
 	SignIn: undefined;
 	SignUp: undefined;
 };
-
-// export type HomeScreenProps = NativeStackScreenProps<RootStackParamList, "Home">;

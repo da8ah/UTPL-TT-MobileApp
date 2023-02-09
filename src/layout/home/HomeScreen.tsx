@@ -14,6 +14,8 @@ const styles = StyleSheet.create({
 });
 
 const HomeScreen = () => {
+	const [refreshing, setRefreshing] = useState<boolean>(false);
+
 	const [books, setBooks] = useState<StockBook[]>([]);
 	const [bestSeller, setBestSeller] = useState<StockBook[]>([]);
 	const [recommended, setRecommended] = useState<StockBook[]>([]);
@@ -44,8 +46,10 @@ const HomeScreen = () => {
 	useEffect(() => {}, [books, inOffer, bestSeller, recommended, recent]);
 
 	const fetchData = () => {
+		setRefreshing(true);
 		setTimeout(async () => {
 			await booksViMo.getDataFromServer();
+			setRefreshing(false);
 		}, 2000);
 	};
 
@@ -58,10 +62,10 @@ const HomeScreen = () => {
 	return (
 		<Layout style={styles.body}>
 			<ScrollView>
-				<Bookshelf identifier={"inOffer"} tag={"En Oferta"} books={inOffer} />
-				<Bookshelf identifier={"bestSeller"} tag={"Más Vendido"} books={bestSeller} />
-				<Bookshelf identifier={"recommended"} tag={"Recomendado"} books={recommended} />
-				<Bookshelf identifier={"recent"} tag={"Reciente"} books={recent} />
+				<Bookshelf identifier={"inOffer"} tag={"En Oferta"} books={inOffer} refreshing={refreshing} />
+				<Bookshelf identifier={"bestSeller"} tag={"Más Vendido"} books={bestSeller} refreshing={refreshing} />
+				<Bookshelf identifier={"recommended"} tag={"Recomendado"} books={recommended} refreshing={refreshing} />
+				<Bookshelf identifier={"recent"} tag={"Reciente"} books={recent} refreshing={refreshing} />
 			</ScrollView>
 		</Layout>
 	);

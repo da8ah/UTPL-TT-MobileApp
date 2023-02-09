@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { Button, Icon, Input, Layout, Text } from "@ui-kitten/components";
+import { Button, Icon, Input, Layout, Modal, Text } from "@ui-kitten/components";
 import { TouchableWithoutFeedback } from "@ui-kitten/components/devsupport";
 import { useEffect, useState } from "react";
 import { Keyboard, KeyboardAvoidingView, StyleSheet } from "react-native";
@@ -123,7 +123,13 @@ const InputWithPassword = (props: { password: any; setPassword: any }) => {
 };
 
 const SignUpBody = () => {
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const navigation: any = useNavigation<RootStackParamList>();
+
 	const [isKeyboardActive, setKeyboardActiveStatus] = useState(false);
+	const [modalVisibility, setModalVisibility] = useState(false);
+	const [modalChildren, setModalChildren] = useState<JSX.Element>();
+
 	const [userCheck, setUserCheck] = useState<boolean>(true);
 	const [nameCheck, setNameCheck] = useState<boolean>(true);
 	const [emailCheck, setEmailCheck] = useState<boolean>(true);
@@ -379,12 +385,87 @@ const SignUpBody = () => {
 							new BillingInfo(toWhom?.trimEnd(), ci?.trimEnd(), provincia?.trimEnd(), ciudad?.trimEnd(), numCasa?.trimEnd(), calles?.trimEnd()),
 						);
 						const resultado = await signUpViMo.signup(client);
-						console.log(resultado);
+						setModalChildren(
+							<ModalSaveConfirmation codeStatus={resultado} goBackOnSuccess={navigation.goBack} setModalVisibility={setModalVisibility} />,
+						);
+						setModalVisibility(true);
 					}}
 				>
 					GUARDAR
 				</Button>
 			</Layout>
+			<Modal
+				visible={modalVisibility}
+				style={{ width: "70%" }}
+				backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+				onBackdropPress={() => setModalVisibility(false)}
+				children={modalChildren}
+			/>
+		</Layout>
+	);
+};
+
+const ModalSaveConfirmation = (props: {
+	codeStatus: string | null;
+	goBackOnSuccess: () => void;
+	setModalVisibility: (value: boolean) => void;
+}) => {
+	let title;
+	let message;
+	let icon;
+	let buttonStatus;
+
+	switch (props.codeStatus) {
+		case ":400":
+			title = "Registro no creado";
+			message = "(Verifique que los datos sean correctos)";
+			icon = <Icon name="alert-triangle-outline" fill="gold" height="30" width="30" />;
+			buttonStatus = "warning";
+			break;
+		case "400":
+			title = "Registro no creado";
+			message = "(Verifique que los datos sean correctos)";
+			icon = <Icon name="alert-triangle-outline" fill="gold" height="30" width="30" />;
+			buttonStatus = "warning";
+			break;
+		case "303":
+			title = "Registro no creado";
+			message = "(El usuario o email ya existen)";
+			icon = <Icon name="alert-triangle-outline" fill="gold" height="30" width="30" />;
+			buttonStatus = "danger";
+			break;
+		case "201":
+			title = "Registro Creado";
+			message = "(Volviendo al Inicio de Sesión)";
+			icon = <Icon name="checkmark-circle-outline" fill="darkgreen" height="30" width="30" />;
+			buttonStatus = "success";
+			break;
+		default:
+			title = "Registro no creado";
+			message = "(Servidor no disponible, intente más tarde)";
+			icon = <Icon name="alert-triangle-outline" fill="gold" height="30" width="30" />;
+			buttonStatus = "danger";
+			break;
+	}
+
+	return (
+		<Layout style={{ alignItems: "center", padding: 20, borderRadius: 20 }}>
+			<Layout style={{ width: "100%", alignItems: "center", marginTop: 10 }}>
+				<Text style={{ textTransform: "uppercase" }}>{title}</Text>
+				{icon}
+				<Text style={{ fontSize: 12, marginVertical: 5 }}>{message}</Text>
+			</Layout>
+			<Button
+				size="small"
+				status={buttonStatus}
+				style={{ width: "50%", marginTop: 10 }}
+				onPress={() => {
+					props.setModalVisibility(false);
+					if (props.codeStatus === "201") props.goBackOnSuccess();
+				}}
+			>
+				Ok
+			</Button>
 		</Layout>
 	);
 };

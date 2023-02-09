@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import clientViMo, { AuthObserver } from "../viewmodel/ClientViMo";
 import SignInScreen from "./auth/SignInScreen";
 import SignUpScreen from "./auth/SignUpScreen";
+import OrderScreen from "./cart/OrderScreen";
 import MainTabsNavScreen from "./MainTabsNavScreen";
 import { RootStackParamList } from "./NavigationTypes";
 import ProfileScreen from "./user/ProfileScreen";
@@ -41,7 +42,7 @@ const RootNavigator = () => {
 				{isAuth ? (
 					<Stack.Group>
 						<Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: true, animation: "slide_from_left" }} />
-						{/* <Stack.Screen name="Order" component={OrderScreen} /> */}
+						<Stack.Screen name="Order" component={OrderScreen} options={{ animation: "slide_from_right" }} />
 					</Stack.Group>
 				) : (
 					<Stack.Group>

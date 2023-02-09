@@ -10,16 +10,17 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		textAlign: "center",
 	},
-	// container: { flex: 1, paddingTop: 10, paddingHorizontal: 5 },
 	buttonLayout: { backgroundColor: "transparent", flexDirection: "row", justifyContent: "space-around", alignItems: "center" },
-	cardPropsRow: { backgroundColor: "transparent", flexDirection: "row" },
+	cardPropsRow: { backgroundColor: "transparent", flexDirection: "row", alignItems: "center", marginHorizontal: -15 },
 	cardKeys: {
-		width: "40%",
+		width: "35%",
 		fontSize: 10,
 		textTransform: "uppercase",
 	},
 	cardValues: {
-		width: "60%",
+		width: "65%",
+		height: 20,
+		fontSize: 15,
 	},
 });
 
@@ -37,10 +38,10 @@ const ProfileScreen = () => {
 	};
 	const cuentaChildren: JSX.Element[] = Object.entries(cuenta).map(([key, value], index) => (
 		<Layout key={`clientProp${index}`} style={styles.cardPropsRow}>
-			<Text style={styles.cardKeys} adjustsFontSizeToFit>
-				{key}
+			<Text style={styles.cardKeys}>{key}</Text>
+			<Text style={styles.cardValues} numberOfLines={1} ellipsizeMode="middle">
+				{value}
 			</Text>
-			<Text style={styles.cardValues}>{value}</Text>
 		</Layout>
 	));
 
@@ -54,10 +55,10 @@ const ProfileScreen = () => {
 	};
 	const facturacionChildren: JSX.Element[] = Object.entries(facturacion).map(([key, value], index) => (
 		<Layout key={`billingInfoProp${index}`} style={styles.cardPropsRow}>
-			<Text style={styles.cardKeys} adjustsFontSizeToFit>
-				{key}
+			<Text style={styles.cardKeys}>{key}</Text>
+			<Text style={styles.cardValues} numberOfLines={1} ellipsizeMode="middle">
+				{value}
 			</Text>
-			<Text style={styles.cardValues}>{value}</Text>
 		</Layout>
 	));
 
@@ -70,7 +71,7 @@ const ProfileScreen = () => {
 
 	return (
 		<Layout style={{ flex: 1, justifyContent: "space-evenly", alignItems: "center", paddingTop: 35 }}>
-			<Layout>
+			<Layout style={{ alignItems: "center" }}>
 				<Icon name="person-outline" fill="black" height="100" width="100" />
 				<Text style={{ fontSize: 30, fontFamily: "serif", fontStyle: "italic", textAlign: "center", textTransform: "uppercase" }}>
 					{cuenta.usuario}
