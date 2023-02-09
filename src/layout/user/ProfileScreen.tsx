@@ -1,7 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { Button, Card, Icon, Layout, Text } from "@ui-kitten/components";
-import { useState } from "react";
-import { SafeAreaView, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import clientViMo from "../../viewmodel/ClientViMo";
 import { RootStackParamList } from "../NavigationTypes";
 

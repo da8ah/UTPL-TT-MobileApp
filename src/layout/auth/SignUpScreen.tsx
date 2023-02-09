@@ -3,6 +3,10 @@ import { Button, Icon, Input, Layout, Text } from "@ui-kitten/components";
 import { TouchableWithoutFeedback } from "@ui-kitten/components/devsupport";
 import { useEffect, useState } from "react";
 import { Keyboard, KeyboardAvoidingView, StyleSheet } from "react-native";
+import BillingInfo from "../../core/entities/BillingInfo";
+import Client from "../../core/entities/Client";
+import { InputValidator } from "../../core/entities/utils";
+import signUpViMo, { SignUpObserver } from "../../viewmodel/SignUpViMo";
 import { RootStackParamList } from "../NavigationTypes";
 
 const transparent = "transparent";
@@ -44,14 +48,14 @@ const styles = StyleSheet.create({
 
 const SignUpScreen = () => (
 	<Layout style={[styles.common, styles.container]}>
-		<SignInHeader />
-		<SignInBody />
+		<SignUpHeader />
+		<SignUpBody />
 	</Layout>
 );
 
 export default SignUpScreen;
 
-const SignInHeader = () => {
+const SignUpHeader = () => {
 	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	const navigation: any = useNavigation<RootStackParamList>();
 
@@ -80,7 +84,7 @@ const SignInHeader = () => {
 					status="basic"
 					accessoryLeft={TrashIcon}
 					style={{ height: 40, width: 40, borderRadius: 100 }}
-					//  onPress={() => clearInputs()}
+					onPress={() => signUpViMo.clearInputs()}
 				/>
 			</Layout>
 		</Layout>
@@ -88,9 +92,9 @@ const SignInHeader = () => {
 };
 
 // rome-ignore lint/suspicious/noExplicitAny: <explanation>
-const InputWithPassword = (props: { setPassword: any }) => {
-	const [inputValue, setInputValue] = useState<string>();
+const InputWithPassword = (props: { password: any; setPassword: any }) => {
 	const [secureTextEntry, setSecureTextEntry] = useState(true);
+	const [passwordCheck, setPasswordCheck] = useState<boolean>(true);
 
 	const togglePasswordVisibility = () => {
 		setSecureTextEntry(!secureTextEntry);
@@ -105,23 +109,69 @@ const InputWithPassword = (props: { setPassword: any }) => {
 	return (
 		<Input
 			textContentType="password"
-			style={styles.input}
-			value={inputValue}
+			style={[styles.input, { borderRightWidth: 2, borderEndColor: !passwordCheck ? "red" : "mediumspringgreen" }]}
 			accessoryRight={PasswordVisibilityIcon}
 			secureTextEntry={secureTextEntry}
+			value={props.password}
 			onChangeText={(nextValue) => {
-				setInputValue(nextValue);
 				props.setPassword(nextValue);
+				const passworPattern = /^[\w\W\s]{5,}$/;
+				setPasswordCheck(new RegExp(passworPattern).test(nextValue));
 			}}
 		/>
 	);
 };
 
-const ButtonIcon = () => <Icon name="save" fill="white" height="20" width="20" />;
-const SignInBody = () => {
+const SignUpBody = () => {
 	const [isKeyboardActive, setKeyboardActiveStatus] = useState(false);
-	const [user, setUser] = useState<string>();
-	const [password, setPassword] = useState<string>();
+	const [userCheck, setUserCheck] = useState<boolean>(true);
+	const [nameCheck, setNameCheck] = useState<boolean>(true);
+	const [emailCheck, setEmailCheck] = useState<boolean>(true);
+	const [mobileCheck, setMobileCheck] = useState<boolean>(true);
+	const [toWhomCheck, setToWhomCheck] = useState<boolean>(true);
+	const [ciCheck, setCiCheck] = useState<boolean>(true);
+	const [provinciaCheck, setProvinciaCheck] = useState<boolean>(true);
+	const [ciudadCheck, setCiudadCheck] = useState<boolean>(true);
+	const [numCasaCheck, setNumCasaCheck] = useState<boolean>(true);
+	const [callesCheck, setCallesCheck] = useState<boolean>(true);
+
+	const [user, setUser] = useState<string>("da8ah.tiber");
+	const [name, setName] = useState<string>("Danilo Ochoa Hidalgo");
+	const [email, setEmail] = useState<string>("danilo.ochoa.hidalgo@email.com");
+	const [mobile, setMobile] = useState<string>("+593000000001");
+	const [password, setPassword] = useState<string>("tibernuncamuere");
+
+	const [toWhom, setToWhom] = useState<string>("Danilo Ochoa Hidalgo");
+	const [ci, setCi] = useState<string>("1000000001");
+	const [provincia, setProvincia] = useState<string>("Loja");
+	const [ciudad, setCiudad] = useState<string>("Loja");
+	const [numCasa, setNumCasa] = useState<string>("000");
+	const [calles, setCalles] = useState<string>("Principal y Secundaria");
+
+	const clearInputs: SignUpObserver = () => {
+		setUserCheck(true);
+		setNameCheck(true);
+		setEmailCheck(true);
+		setMobileCheck(true);
+		setToWhomCheck(true);
+		setCiCheck(true);
+		setProvinciaCheck(true);
+		setCiudadCheck(true);
+		setNumCasaCheck(true);
+		setCallesCheck(true);
+
+		setUser("");
+		setName("");
+		setEmail("");
+		setMobile("");
+		setPassword("");
+		setToWhom("");
+		setCi("");
+		setProvincia("");
+		setCiudad("");
+		setNumCasa("");
+		setCalles("");
+	};
 
 	useEffect(() => {
 		const hideSubscription = Keyboard.addListener("keyboardDidHide", () => setKeyboardActiveStatus(false));
@@ -130,6 +180,12 @@ const SignInBody = () => {
 		};
 	}, [Keyboard]);
 
+	useEffect(() => {
+		signUpViMo.attach(clearInputs);
+		return () => signUpViMo.detach();
+	}, []);
+
+	const ButtonIcon = () => <Icon name="save" fill="white" height="20" width="20" />;
 	return (
 		<Layout style={[styles.common, styles.body]}>
 			<Layout style={[styles.common, { display: !isKeyboardActive ? "flex" : "none", marginVertical: 10 }]}>
@@ -143,7 +199,15 @@ const SignInBody = () => {
 								USUARIO
 							</Text>
 						</Layout>
-						<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} />
+						<Input
+							style={[styles.input, { borderRightWidth: 2, borderEndColor: !userCheck ? "red" : "mediumspringgreen" }]}
+							value={user}
+							onChangeText={(user) => {
+								setUser(user);
+								const userPattern = /^[A-Za-z]((\_|\.)?[A-Za-z0-9]){5,19}$/;
+								setUserCheck(new RegExp(userPattern).test(user.trimEnd()));
+							}}
+						/>
 					</Layout>
 					<Layout style={styles.inputLayout}>
 						<Layout style={[styles.inputTitle]}>
@@ -151,7 +215,15 @@ const SignInBody = () => {
 								NOMBRE
 							</Text>
 						</Layout>
-						<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} />
+						<Input
+							style={[styles.input, { borderRightWidth: 2, borderEndColor: !nameCheck ? "red" : "mediumspringgreen" }]}
+							value={name}
+							onChangeText={(name) => {
+								setName(name);
+								const namePattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}(\s[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}){1,4}$/;
+								setNameCheck(new RegExp(namePattern).test(name.trimEnd()));
+							}}
+						/>
 					</Layout>
 					<Layout style={styles.inputLayout}>
 						<Layout style={[styles.inputTitle]}>
@@ -159,7 +231,15 @@ const SignInBody = () => {
 								EMAIL
 							</Text>
 						</Layout>
-						<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} />
+						<Input
+							style={[styles.input, { borderRightWidth: 2, borderEndColor: !emailCheck ? "red" : "mediumspringgreen" }]}
+							value={email}
+							onChangeText={(email) => {
+								setEmail(email);
+								const emailPattern = /^([\w\.\-]+){1,3}@([\w\-]+)((\.(\w){2,3})+)$/;
+								setEmailCheck(new RegExp(emailPattern).test(email.trimEnd()));
+							}}
+						/>
 					</Layout>
 					<Layout style={styles.inputLayout}>
 						<Layout style={[styles.inputTitle]}>
@@ -167,7 +247,15 @@ const SignInBody = () => {
 								MÓVIL
 							</Text>
 						</Layout>
-						<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} />
+						<Input
+							style={[styles.input, { borderRightWidth: 2, borderEndColor: !mobileCheck ? "red" : "mediumspringgreen" }]}
+							value={mobile}
+							onChangeText={(mobile) => {
+								setMobile(mobile);
+								const mobilePattern = /^(\+593)?\s?(\d{10}|\d{9})$/;
+								setMobileCheck(new RegExp(mobilePattern).test(mobile.trimEnd()));
+							}}
+						/>
 					</Layout>
 					<Layout style={styles.inputLayout}>
 						<Layout style={[styles.inputTitle, { borderBottomLeftRadius: 10 }]}>
@@ -175,7 +263,7 @@ const SignInBody = () => {
 								CLAVE
 							</Text>
 						</Layout>
-						<InputWithPassword setPassword={setPassword} />
+						<InputWithPassword password={password} setPassword={setPassword} />
 					</Layout>
 				</Layout>
 				<Layout style={[styles.inputLayout, { marginTop: !isKeyboardActive ? 20 : 2 }]}>
@@ -184,7 +272,16 @@ const SignInBody = () => {
 							Destinatario
 						</Text>
 					</Layout>
-					<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} onFocus={() => setKeyboardActiveStatus(false)} />
+					<Input
+						style={[styles.input, { borderRightWidth: 2, borderEndColor: !toWhomCheck ? "red" : "mediumspringgreen" }]}
+						value={toWhom}
+						onChangeText={(toWhom) => {
+							setToWhom(toWhom);
+							const toWhomPattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}(\s[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}){1,4}$/;
+							setToWhomCheck(new RegExp(toWhomPattern).test(toWhom.trimEnd()));
+						}}
+						onFocus={() => setKeyboardActiveStatus(false)}
+					/>
 				</Layout>
 				<Layout style={styles.inputLayout}>
 					<Layout style={[styles.inputTitle]}>
@@ -192,7 +289,15 @@ const SignInBody = () => {
 							CI
 						</Text>
 					</Layout>
-					<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} />
+					<Input
+						style={[styles.input, { borderRightWidth: 2, borderEndColor: !ciCheck ? "red" : "mediumspringgreen" }]}
+						value={ci}
+						onChangeText={(ci) => {
+							setCi(ci);
+							const ciPattern = /^\d{10}$/;
+							setCiCheck(new RegExp(ciPattern).test(ci.trimEnd()));
+						}}
+					/>
 				</Layout>
 				<Layout style={styles.inputLayout}>
 					<Layout style={[styles.inputTitle]}>
@@ -200,7 +305,16 @@ const SignInBody = () => {
 							Provincia
 						</Text>
 					</Layout>
-					<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} onFocus={() => setKeyboardActiveStatus(true)} />
+					<Input
+						style={[styles.input, { borderRightWidth: 2, borderEndColor: !provinciaCheck ? "red" : "mediumspringgreen" }]}
+						value={provincia}
+						onChangeText={(provincia) => {
+							setProvincia(provincia);
+							const provinciaPattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}(\.)?(\s[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}){0,4}$/;
+							setProvinciaCheck(new RegExp(provinciaPattern).test(provincia.trimEnd()));
+						}}
+						onFocus={() => setKeyboardActiveStatus(true)}
+					/>
 				</Layout>
 				<Layout style={styles.inputLayout}>
 					<Layout style={[styles.inputTitle]}>
@@ -208,7 +322,16 @@ const SignInBody = () => {
 							Ciudad
 						</Text>
 					</Layout>
-					<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} onFocus={() => setKeyboardActiveStatus(true)} />
+					<Input
+						style={[styles.input, { borderRightWidth: 2, borderEndColor: !ciudadCheck ? "red" : "mediumspringgreen" }]}
+						value={ciudad}
+						onChangeText={(ciudad) => {
+							setCiudad(ciudad);
+							const ciudadPattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}(\.)?(\s[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}){0,4}$/;
+							setCiudadCheck(new RegExp(ciudadPattern).test(ciudad.trimEnd()));
+						}}
+						onFocus={() => setKeyboardActiveStatus(true)}
+					/>
 				</Layout>
 				<Layout style={styles.inputLayout}>
 					<Layout style={[styles.inputTitle]}>
@@ -216,7 +339,16 @@ const SignInBody = () => {
 							Número de casa
 						</Text>
 					</Layout>
-					<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} onFocus={() => setKeyboardActiveStatus(true)} />
+					<Input
+						style={[styles.input, { borderRightWidth: 2, borderEndColor: !numCasaCheck ? "red" : "mediumspringgreen" }]}
+						value={numCasa}
+						onChangeText={(numCasa) => {
+							setNumCasa(numCasa);
+							const numCasaPattern = /^\d((\-|\s)?\d){1,10}$/;
+							setNumCasaCheck(new RegExp(numCasaPattern).test(numCasa.trimEnd()));
+						}}
+						onFocus={() => setKeyboardActiveStatus(true)}
+					/>
 				</Layout>
 				<Layout style={styles.inputLayout}>
 					<Layout style={[styles.inputTitle, { borderBottomLeftRadius: 10 }]}>
@@ -224,7 +356,16 @@ const SignInBody = () => {
 							Calles
 						</Text>
 					</Layout>
-					<Input style={styles.input} onChangeText={(newUser) => setUser(newUser)} onFocus={() => setKeyboardActiveStatus(true)} />
+					<Input
+						style={[styles.input, { borderRightWidth: 2, borderEndColor: !callesCheck ? "red" : "mediumspringgreen" }]}
+						value={calles}
+						onChangeText={(calles) => {
+							setCalles(calles);
+							const callesPattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ0-9]{1,15}((\.|\-|\,)?\s?[A-Za-zÁáÉéÍíÓóÚúÜüÑñ0-9]{1,15}){3,10}$/;
+							setCallesCheck(new RegExp(callesPattern).test(calles.trimEnd()));
+						}}
+						onFocus={() => setKeyboardActiveStatus(true)}
+					/>
 				</Layout>
 			</KeyboardAvoidingView>
 			<Layout style={styles.buttonLayout}>
@@ -233,8 +374,12 @@ const SignInBody = () => {
 					status="success"
 					accessoryRight={ButtonIcon}
 					onPress={async () => {
-						// await adminViMo.login(new Admin(user?.trim(), undefined, undefined, undefined, password));
-						// if (adminViMo.getAdmin()?.getUser() !== undefined) props.setAuth(true);
+						const client = new Client(user?.trimEnd(), name?.trimEnd(), email?.trimEnd(), mobile?.trimEnd(), password);
+						client.setBillingInfo(
+							new BillingInfo(toWhom?.trimEnd(), ci?.trimEnd(), provincia?.trimEnd(), ciudad?.trimEnd(), numCasa?.trimEnd(), calles?.trimEnd()),
+						);
+						const resultado = await signUpViMo.signup(client);
+						console.log(resultado);
 					}}
 				>
 					GUARDAR

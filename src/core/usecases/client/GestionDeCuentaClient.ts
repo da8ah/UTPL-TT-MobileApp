@@ -4,8 +4,13 @@ import { ServerDataSource } from "../../data/ServerDataSource";
 import Client from "../../entities/Client";
 
 export default class GestionDeCuentaClient {
-	public async crearCuenta(client: Client, repository: ServerDataSource): Promise<boolean | null> {
-		throw new Error("Method not implemented.");
+	public static async crearCuenta(client: Client, repository: ServerDataSource): Promise<string | null> {
+		try {
+			return await repository.uploadNewProfile(client);
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
 	}
 
 	public static async iniciarSesion(client: Client, repository: ServerDataSource): Promise<{ token: string | null; client: Client | null } | null> {

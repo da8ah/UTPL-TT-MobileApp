@@ -1,11 +1,12 @@
 import config from "../config";
+import BillingInfo from "../entities/BillingInfo";
 import Client from "../entities/Client";
 import StockBook from "../entities/StockBook";
-import { BookConverter, ClientConverter, IStockBook } from "../entities/utils";
+import { BookConverter, ClientConverter, InputValidator, IStockBook } from "../entities/utils";
 
 export class ServerDataSource {
 	private static repository: ServerDataSource | null = null;
-	private apiURL: string | null = config.URL.REPOSITORY;
+	private apiURL: string | null = config.URL.INTERFACE;
 
 	// SINGLETON
 	private constructor() {}
@@ -16,6 +17,25 @@ export class ServerDataSource {
 	}
 
 	// CLIENT
+	public async uploadNewProfile(client: Client): Promise<string | null> {
+		try {
+			if (!(InputValidator.validateUser(client) && InputValidator.validateBillingInfo(client.getBillingInfo() || new BillingInfo()))) return ":400";
+			const regURL = config.URL.REGISTRATION;
+			if (!regURL) return null;
+			const httpContent = {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(client),
+			};
+			return await fetch(regURL, httpContent).then((res) => res.status.toString());
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	}
+
 	public async downloadProfile(data: { token: string | null; client: Client | null }): Promise<{
 		token: string | null;
 		client: Client | null;
@@ -51,7 +71,7 @@ export class ServerDataSource {
 					},
 					body: JSON.stringify({ user: data.client.getUser(), password: data.client.getPassword() }),
 				};
-				await fetch(`${authURL}`, httpContent)
+				await fetch(authURL, httpContent)
 					.then((res) => {
 						token = res.headers.get("set-cookie")?.split(";")[0].split("=")[1];
 						return res.json();

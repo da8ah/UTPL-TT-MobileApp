@@ -4,6 +4,7 @@ import Cart from "./Cart";
 import Client from "./Client";
 import StockBook from "./StockBook";
 import ToBuyBook from "./ToBuyBook";
+import User from "./User";
 
 export type IStockBook = {
 	isbn?: string;
@@ -191,5 +192,56 @@ export class ClientConverter {
 		);
 		client.setBillingInfo(newBillingInfo);
 		return client;
+	}
+}
+
+export class InputValidator {
+	private static userPattern = /^[A-Za-z]((\_|\.)?[A-Za-z0-9]){5,19}$/;
+	private static namePattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}(\s[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}){1,4}$/;
+	private static emailPattern = /^([\w\.\-]+){1,3}@([\w\-]+)((\.(\w){2,3})+)$/;
+	private static mobilePattern = /^(\+593)?\s?(\d{10}|\d{9})$/;
+	private static passworPattern = /^[\w\W\s]{5,}$/;
+
+	private static toWhomPattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}(\s[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}){1,4}$/;
+	private static ciPattern = /^\d{10}$/;
+	private static provinciaPattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}(\.)?(\s[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}){0,4}$/;
+	private static ciudadPattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}(\.)?(\s[A-Za-zÁáÉéÍíÓóÚúÜüÑñ]{1,15}){0,4}$/;
+	private static numCasaPattern = /^\d((\-|\s)?\d){1,10}$/;
+	private static callesPattern = /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ0-9]{1,15}((\.|\-|\,)?\s?[A-Za-zÁáÉéÍíÓóÚúÜüÑñ0-9]{1,15}){3,10}$/;
+
+	public static validateUser(user: User): boolean {
+		if (!new RegExp(this.userPattern).test(user.getUser() || "")) return false;
+		if (!new RegExp(this.namePattern).test(user.getName() || "")) return false;
+		if (!new RegExp(this.emailPattern).test(user.getEmail() || "")) return false;
+		if (!new RegExp(this.mobilePattern).test(user.getMobile() || "")) return false;
+		if (!new RegExp(this.passworPattern).test(user.getPassword() || "")) return false;
+		return true;
+	}
+	public static validateUserToUpdate(user: User): boolean {
+		if (!(user.getUser() === undefined || new RegExp(this.userPattern).test(user.getUser() || ""))) return false;
+		if (!(user.getName() === undefined || new RegExp(this.namePattern).test(user.getName() || ""))) return false;
+		if (!(user.getEmail() === undefined || new RegExp(this.emailPattern).test(user.getEmail() || ""))) return false;
+		if (!(user.getMobile() === undefined || new RegExp(this.mobilePattern).test(user.getMobile() || ""))) return false;
+		if (!(user.getPassword() === undefined || new RegExp(this.passworPattern).test(user.getPassword() || ""))) return false;
+		return true;
+	}
+
+	public static validateBillingInfo(billingInfo: BillingInfo): boolean {
+		if (!new RegExp(this.toWhomPattern).test(billingInfo.getToWhom() || "")) return false;
+		if (!new RegExp(this.ciPattern).test(billingInfo.getCi() || "")) return false;
+		if (!new RegExp(this.provinciaPattern).test(billingInfo.getProvincia() || "")) return false;
+		if (!new RegExp(this.ciudadPattern).test(billingInfo.getCiudad() || "")) return false;
+		if (!new RegExp(this.numCasaPattern).test(billingInfo.getNumCasa() || "")) return false;
+		if (!new RegExp(this.callesPattern).test(billingInfo.getCalles() || "")) return false;
+		return true;
+	}
+	public static validateBillingInfoToUpdate(billingInfo: BillingInfo): boolean {
+		if (!(billingInfo.getToWhom() === undefined || new RegExp(this.toWhomPattern).test(billingInfo.getToWhom() || ""))) return false;
+		if (!(billingInfo.getCi() === undefined || new RegExp(this.ciPattern).test(billingInfo.getCi() || ""))) return false;
+		if (!(billingInfo.getProvincia() === undefined || new RegExp(this.provinciaPattern).test(billingInfo.getProvincia() || ""))) return false;
+		if (!(billingInfo.getCiudad() === undefined || new RegExp(this.ciudadPattern).test(billingInfo.getCiudad() || ""))) return false;
+		if (!(billingInfo.getNumCasa() === undefined || new RegExp(this.numCasaPattern).test(billingInfo.getNumCasa() || ""))) return false;
+		if (!(billingInfo.getCalles() === undefined || new RegExp(this.callesPattern).test(billingInfo.getCalles() || ""))) return false;
+		return true;
 	}
 }
