@@ -23,6 +23,8 @@ const styles = StyleSheet.create({
 });
 
 const CartScreen = (props: { closeButton?: JSX.Element; orderButton?: JSX.Element }) => {
+	const [refreshing, setRefreshing] = useState(false);
+
 	const [cart, setCart] = useState<Cart>(cartViMo.getCart());
 	const [books, setBooks] = useState(cart.getToBuyBooks());
 	const [descuento, setDescuento] = useState(cart?.getDiscountCalc() || 0);
@@ -34,12 +36,14 @@ const CartScreen = (props: { closeButton?: JSX.Element; orderButton?: JSX.Elemen
 	useEffect(() => {}, [cart, books, fecha, descuento, iva, subtotal, total]);
 
 	const updateCart: CartObserver = (cart: Cart) => {
+		setRefreshing(true);
 		setCart(cart);
 		setBooks(cart.getToBuyBooks());
 		setDescuento(cart?.getDiscountCalc() || 0);
 		setIva(cart?.getIvaCalc() || 0);
 		setSubtotal(cart?.getSubtotal() || 0);
 		setTotal(cart?.getTotalPrice() || 0);
+		setRefreshing(false);
 	};
 
 	useEffect(() => {
@@ -79,7 +83,7 @@ const CartScreen = (props: { closeButton?: JSX.Element; orderButton?: JSX.Elemen
 				</Layout>
 			</Layout>
 			<Layout style={styles.cartBooks}>
-				<List scrollEnabled listKey={"cart"} initialNumToRender={5} data={books} extraData={books} renderItem={CartItem} />
+				<List scrollEnabled listKey={"cart"} initialNumToRender={5} data={books} extraData={books} renderItem={CartItem} refreshing={refreshing} />
 			</Layout>
 			{props.orderButton}
 		</Layout>

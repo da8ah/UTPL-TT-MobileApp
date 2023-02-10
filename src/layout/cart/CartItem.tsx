@@ -13,7 +13,6 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 	},
 	cardLayout: {
-		backgroundColor: "palegoldenrod",
 		flexDirection: "row",
 		height: 100,
 		padding: 2,
@@ -30,19 +29,27 @@ const styles = StyleSheet.create({
 	},
 });
 
-const CartItem: ListRenderItem<ToBuyBook> = (info: ListRenderItemInfo<ToBuyBook>) => <CardToBuyBook book={info.item} />;
+const CartItem: ListRenderItem<ToBuyBook> = (info: ListRenderItemInfo<ToBuyBook>) => <CardToBuyBook book={info.item} index={info.index} />;
 
 export default CartItem;
 
-const CardToBuyBook = (props: { book: ToBuyBook }) => {
+const CardToBuyBook = (props: { book: ToBuyBook; index: number }) => {
+	const [bcc, setBcc] = useState("palegoldenrod");
 	const [cant, setCant] = useState(props.book.getCant() || 0);
 
 	return (
-		<Layout style={styles.cardLayout}>
+		<TouchableOpacity
+			style={[styles.cardLayout, { backgroundColor: bcc }]}
+			onPressIn={() => setBcc("tomato")}
+			onPressOut={() => setBcc("palegoldenrod")}
+			onLongPress={() => {
+				cartViMo.removeBookFromCart(props.index);
+			}}
+		>
 			<ItemLeftPanel book={props.book} />
 			<ItemCenterPanel book={props.book} cant={cant} cantUpdater={setCant} />
 			<ItemRightPanel book={props.book} cant={cant} />
-		</Layout>
+		</TouchableOpacity>
 	);
 };
 

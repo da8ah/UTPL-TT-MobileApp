@@ -4,6 +4,7 @@ import { TouchableWithoutFeedback } from "@ui-kitten/components/devsupport";
 import { useState } from "react";
 import { KeyboardAvoidingView, StyleSheet } from "react-native";
 import Client from "../../core/entities/Client";
+import cartViMo from "../../viewmodel/CartViMo";
 import clientViMo from "../../viewmodel/ClientViMo";
 import { RootStackParamList } from "../NavigationTypes";
 
@@ -69,7 +70,7 @@ const SignInHeader = () => {
 					accessoryLeft={CloseIcon}
 					style={{ borderRadius: 100 }}
 					onPress={() => {
-						navigation.navigate("Profile");
+						navigation.goBack();
 					}}
 				/>
 				<Text category="h1" status="info" style={{ fontStyle: "italic" }}>
@@ -82,8 +83,7 @@ const SignInHeader = () => {
 };
 
 // rome-ignore lint/suspicious/noExplicitAny: <explanation>
-const InputWithPassword = (props: { setPassword: any }) => {
-	const [inputValue, setInputValue] = useState<string>();
+const InputWithPassword = (props: { password: string; setPassword: any }) => {
 	const [secureTextEntry, setSecureTextEntry] = useState(true);
 
 	const togglePasswordVisibility = () => {
@@ -101,11 +101,10 @@ const InputWithPassword = (props: { setPassword: any }) => {
 			selectionColor='black'
 			textContentType="password"
 			style={styles.input}
-			value={inputValue}
+			value={props.password}
 			accessoryRight={PasswordVisibilityIcon}
 			secureTextEntry={secureTextEntry}
 			onChangeText={(nextValue) => {
-				setInputValue(nextValue);
 				props.setPassword(nextValue);
 			}}
 		/>
@@ -117,7 +116,7 @@ const SignInBody = () => {
 	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	const navigation: any = useNavigation<RootStackParamList>();
 	const [user, setUser] = useState<string>();
-	const [password, setPassword] = useState<string>();
+	const [password, setPassword] = useState<string>("");
 
 	return (
 		<Layout style={[styles.common, styles.body]}>
@@ -131,7 +130,7 @@ const SignInBody = () => {
 							USUARIO
 						</Text>
 					</Layout>
-					<Input selectionColor='black' style={styles.input} onChangeText={(newUser) => setUser(newUser)} />
+					<Input selectionColor='black' style={styles.input} value={user} onChangeText={(newUser) => setUser(newUser)} />
 				</Layout>
 				<Layout style={styles.inputLayout}>
 					<Layout style={[styles.inputTitle, { borderBottomLeftRadius: 10 }]}>
@@ -139,7 +138,7 @@ const SignInBody = () => {
 							CLAVE
 						</Text>
 					</Layout>
-					<InputWithPassword setPassword={setPassword} />
+					<InputWithPassword password={password} setPassword={setPassword} />
 				</Layout>
 				<Layout style={styles.buttonLayout}>
 					<Button
@@ -148,7 +147,10 @@ const SignInBody = () => {
 						accessoryRight={ButtonIcon}
 						onPress={async () => {
 							await clientViMo.login(new Client(user?.trim(), undefined, undefined, undefined, password));
-							if (clientViMo.isAuth()) navigation.goBack();
+							if (clientViMo.isAuth() && cartViMo.wasCalledFromCart()) {
+								cartViMo.setCallFromCart(false);
+								navigation.navigate("Order");
+							} else if (clientViMo.isAuth()) navigation.navigate("Profile");
 						}}
 					>
 						INICIAR SESIÓN

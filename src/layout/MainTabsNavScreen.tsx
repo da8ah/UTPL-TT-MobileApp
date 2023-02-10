@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { BottomNavigation, BottomNavigationTab, Button, Icon, Layout, Text } from "@ui-kitten/components";
 import React, { useCallback, useRef } from "react";
 import { StyleSheet } from "react-native";
+import cartViMo from "../viewmodel/CartViMo";
 import clientViMo from "../viewmodel/ClientViMo";
 import CartScreen from "./cart/CartScreen";
 import BooksScreen from "./home/BooksScreen";
@@ -72,7 +73,11 @@ const MainTabsNavScreen = () => {
 			accessoryLeft={ButtonIconLeft}
 			accessoryRight={ButtonIconRight}
 			onPress={() => {
-				navigation.navigate(clientViMo.isAuth() ? "Order" : "SignIn");
+				const books = cartViMo.getCart().getToBuyBooks();
+				if (books !== undefined && books.length > 0) {
+					cartViMo.setCallFromCart(true);
+					navigation.navigate(clientViMo.isAuth() ? "Order" : "SignIn");
+				}
 				handleCloseModalPress();
 			}}
 		>

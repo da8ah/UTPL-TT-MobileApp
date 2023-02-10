@@ -70,13 +70,10 @@ export default class Cart {
 		if (this.toBuyBooks === undefined) this.toBuyBooks = [];
 		this.toBuyBooks.push(toBuyBook);
 	}
-	public rmToBuyBook(toBuyBook: ToBuyBook): void {
+	public rmToBuyBook(index: number): void {
 		if (this.toBuyBooks === undefined) return;
 		if (this.toBuyBooks?.length > 1) {
-			this.toBuyBooks?.concat(
-				this.toBuyBooks?.splice(0, this.toBuyBooks.indexOf(toBuyBook)),
-				this.toBuyBooks?.splice(this.toBuyBooks.indexOf(toBuyBook), this.toBuyBooks.length - 1),
-			);
+			this.toBuyBooks?.splice(index, 1);
 		} else {
 			this.toBuyBooks = [];
 		}

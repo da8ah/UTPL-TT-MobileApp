@@ -141,18 +141,18 @@ const SignUpBody = () => {
 	const [numCasaCheck, setNumCasaCheck] = useState<boolean>(true);
 	const [callesCheck, setCallesCheck] = useState<boolean>(true);
 
-	const [user, setUser] = useState<string>("da8ah.tiber");
-	const [name, setName] = useState<string>("Danilo Ochoa Hidalgo");
-	const [email, setEmail] = useState<string>("danilo.ochoa.hidalgo@email.com");
-	const [mobile, setMobile] = useState<string>("+593000000001");
-	const [password, setPassword] = useState<string>("tibernuncamuere");
+	const [user, setUser] = useState<string>();
+	const [name, setName] = useState<string>();
+	const [email, setEmail] = useState<string>();
+	const [mobile, setMobile] = useState<string>();
+	const [password, setPassword] = useState<string>();
 
-	const [toWhom, setToWhom] = useState<string>("Danilo Ochoa Hidalgo");
-	const [ci, setCi] = useState<string>("1000000001");
-	const [provincia, setProvincia] = useState<string>("Loja");
-	const [ciudad, setCiudad] = useState<string>("Loja");
-	const [numCasa, setNumCasa] = useState<string>("000");
-	const [calles, setCalles] = useState<string>("Principal y Secundaria");
+	const [toWhom, setToWhom] = useState<string>();
+	const [ci, setCi] = useState<string>();
+	const [provincia, setProvincia] = useState<string>();
+	const [ciudad, setCiudad] = useState<string>();
+	const [numCasa, setNumCasa] = useState<string>();
+	const [calles, setCalles] = useState<string>();
 
 	const clearInputs: SignUpObserver = () => {
 		setUserCheck(true);

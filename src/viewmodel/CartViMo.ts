@@ -9,6 +9,14 @@ export class CartViMo {
 	private repository: ServerDataSource | null = serverDataSource;
 	private cart: Cart = new Cart();
 	private books: StockBook[] = [];
+	private callFromCart = false;
+
+	public wasCalledFromCart() {
+		return this.callFromCart;
+	}
+	public setCallFromCart(value: boolean) {
+		this.callFromCart = value;
+	}
 
 	public getCart(): Cart {
 		this.cart.calculate();
@@ -53,6 +61,13 @@ export class CartViMo {
 			cant,
 		);
 		this.cart.addToBuyBook(toAdd);
+	}
+
+	public removeBookFromCart(index: number) {
+		this.books.splice(index, 1);
+		this.cart.rmToBuyBook(index);
+		this.cart.calculate();
+		if (this.observer) this.observer(this.cart);
 	}
 
 	public updateCantToBuy(toBuyBook: ToBuyBook, cant: number) {
