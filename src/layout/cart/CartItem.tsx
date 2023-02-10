@@ -1,9 +1,8 @@
 import { Button, Input, Layout, Modal, Text } from "@ui-kitten/components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Image, ListRenderItem, ListRenderItemInfo, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
-import StockBook from "../../core/entities/StockBook";
 import ToBuyBook from "../../core/entities/ToBuyBook";
-import cartViMo, { CartObserver } from "../../viewmodel/CartViMo";
+import cartViMo from "../../viewmodel/CartViMo";
 
 const transparent = "transparent";
 const styles = StyleSheet.create({
@@ -14,32 +13,38 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 	},
 	cardLayout: {
-		backgroundColor: "white",
+		backgroundColor: "palegoldenrod",
 		flexDirection: "row",
 		height: 100,
 		padding: 2,
-		marginVertical: 2,
+		margin: 2,
 		borderRadius: 7,
 	},
 	cardLeft: { backgroundColor: transparent, width: "30%" },
-	cardCenter: { backgroundColor: transparent, width: "40%", justifyContent: "space-around" },
-	cardRight: { backgroundColor: "black", width: "30%" },
-	imageLayout: { backgroundColor: "gainsboro", height: 75, alignItems: "center", borderRadius: 5 },
+	cardCenter: { backgroundColor: transparent, width: "35%", justifyContent: "space-around" },
+	cardRight: { backgroundColor: transparent, width: "35%" },
+	imageLayout: { backgroundColor: transparent, height: 75, alignItems: "center", borderRadius: 5 },
 	image: {
 		height: 75,
 		resizeMode: "contain",
 	},
 });
 
-const CartItem: ListRenderItem<ToBuyBook> = (info: ListRenderItemInfo<ToBuyBook>) => (
-	<Layout style={styles.cardLayout}>
-		<ItemLeftPanel book={info.item} />
-		<ItemCenterPanel book={info.item} />
-		<ItemRightPanel book={info.item} />
-	</Layout>
-);
+const CartItem: ListRenderItem<ToBuyBook> = (info: ListRenderItemInfo<ToBuyBook>) => <CardToBuyBook book={info.item} />;
 
 export default CartItem;
+
+const CardToBuyBook = (props: { book: ToBuyBook }) => {
+	const [cant, setCant] = useState(props.book.getCant() || 0);
+
+	return (
+		<Layout style={styles.cardLayout}>
+			<ItemLeftPanel book={props.book} />
+			<ItemCenterPanel book={props.book} cant={cant} cantUpdater={setCant} />
+			<ItemRightPanel book={props.book} cant={cant} />
+		</Layout>
+	);
+};
 
 const ItemLeftPanel = (props: { book: ToBuyBook }) => {
 	const title = props.book.getTitle();
@@ -62,42 +67,50 @@ const ItemLeftPanel = (props: { book: ToBuyBook }) => {
 	);
 };
 
-const ItemCenterPanel = (props: { book: ToBuyBook }) => {
+const ItemCenterPanel = (props: { book: ToBuyBook; cant: number; cantUpdater: (cant: number) => void }) => {
 	const [modalVisibility, setModalVisibility] = useState(false);
 	const [modalChildren, setModalChildren] = useState<JSX.Element>();
-	const [cant, setCant] = useState(props.book.getCant()?.toFixed(0) || "0");
 
-	const price = props.book.getGrossPricePerUnit() || 0;
+	const grossPrice = props.book.getGrossPricePerUnit() || 0;
+	const discountAmount = props.book.getDiscountedAmount() || 0;
+	const price = (props.book.getGrossPricePerUnit() || NaN) - discountAmount;
 	const inOffer = props.book.isInOffer();
 	const itHasIva = props.book.itHasIva();
-	const discountAmount = props.book.getDiscountedAmount() || 0;
 
 	return (
 		<Layout style={[styles.common, styles.cardCenter]}>
 			<Layout style={{ backgroundColor: transparent, width: "100%", flexDirection: "row", justifyContent: "space-around" }}>
-				<Text style={{ fontSize: 10, fontStyle: "italic" }}>{inOffer ? "* En Oferta" : ""}</Text>
-				<Text style={{ fontSize: 10, fontStyle: "italic" }}>{itHasIva ? "* IVA" : ""}</Text>
+				<Text style={{ color: "darkgrey", fontSize: 10, fontStyle: "italic" }}>{inOffer ? "* En Oferta" : ""}</Text>
+				<Text style={{ color: "darkgrey", fontSize: 10, fontStyle: "italic" }}>{itHasIva ? "* IVA" : ""}</Text>
 			</Layout>
-			<Layout style={{ backgroundColor: transparent, width: "100%", flexDirection: "row", justifyContent: "center" }}>
+			<Layout style={{ backgroundColor: transparent, width: "100%", flexDirection: "row", justifyContent: "flex-end" }}>
 				<Layout style={{ backgroundColor: transparent, alignItems: "center" }}>
 					<Text style={{ fontSize: 20 }}>💲{price.toFixed(2)}</Text>
 					<Text
-						style={{ backgroundColor: transparent, width: "100%", textAlign: "right", textAlignVertical: "top", fontSize: 12, fontStyle: "italic" }}
+						style={{
+							backgroundColor: transparent,
+							color: "red",
+							width: "100%",
+							textAlign: "right",
+							textAlignVertical: "top",
+							fontSize: 12,
+							fontStyle: "italic",
+							textDecorationLine: "line-through",
+						}}
 					>
-						{inOffer ? `-${discountAmount.toFixed(2)}` : ""}
+						{inOffer ? `$${grossPrice.toFixed(2)}` : ""}
 					</Text>
 				</Layout>
 				<Layout style={{ backgroundColor: transparent, alignItems: "flex-start", flexDirection: "row" }}>
 					<Text style={{ fontSize: 20 }}> x 📦</Text>
 					<TouchableOpacity
-						style={{ backgroundColor: "royalblue", height: 20, width: 20, borderRadius: 100, justifyContent: "center", alignItems: "center" }}
+						style={{ backgroundColor: "tomato", height: 20, width: 20, borderRadius: 100, justifyContent: "center", alignItems: "center" }}
 						onPressIn={() => {
-							cartViMo.getAvailableStock();
-							setModalChildren(<ModalCant book={props.book} cantUpdater={setCant} setModalVisibility={setModalVisibility} />);
+							setModalChildren(<ModalCant book={props.book} cantUpdater={props.cantUpdater} setModalVisibility={setModalVisibility} />);
 							setModalVisibility(true);
 						}}
 					>
-						<Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>{cant}</Text>
+						<Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>{props.cant}</Text>
 					</TouchableOpacity>
 				</Layout>
 			</Layout>
@@ -112,23 +125,21 @@ const ItemCenterPanel = (props: { book: ToBuyBook }) => {
 	);
 };
 
-const ItemRightPanel = (props: { book: ToBuyBook }) => {
-	const totalPrice = props.book.getPriceCalcPerUnit() || 0;
+const ItemRightPanel = (props: { book: ToBuyBook; cant: number }) => {
+	const totalPrice = (props.book.getPriceCalcPerUnit() || NaN) * props.cant;
+
 	return (
 		<Layout style={[styles.common, styles.cardRight]}>
-			<Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>💲{totalPrice.toFixed(2)}</Text>
+			<Text style={{ color: "yellowgreen", fontSize: 25, fontWeight: "bold", textAlign: "left" }} numberOfLines={1}>
+				💲{totalPrice.toFixed(2)}
+			</Text>
 		</Layout>
 	);
 };
 
-const ModalCant = (props: { book: ToBuyBook; cantUpdater: (cant: string) => void; setModalVisibility: (value: boolean) => void }) => {
+const ModalCant = (props: { book: ToBuyBook; cantUpdater: (cant: number) => void; setModalVisibility: (value: boolean) => void }) => {
 	const [cant, setCant] = useState("0");
-	// const [stock, setStock] = useState(cartViMo.getAvailableStock(props.book) || 0);
-	const stock = 0;
-	useEffect(() => {
-		// setStock(cartViMo.getAvailableStock(props.book) || 0);
-	}, []);
-
+	const stock = cartViMo.getAvailableStock(props.book) || 0;
 	return (
 		<Layout style={{ alignItems: "center", padding: 20, borderRadius: 20 }}>
 			<Layout style={{ flexDirection: "row", justifyContent: "center" }}>
@@ -153,13 +164,21 @@ const ModalCant = (props: { book: ToBuyBook; cantUpdater: (cant: string) => void
 				/>
 			</Layout>
 			<Button
+				status="danger"
 				size="small"
 				style={{ width: "50%" }}
 				onPress={() => {
-					if (stock && Number.parseInt(cant) <= stock) {
-						props.cantUpdater(cant);
+					if (stock) {
+						if (Number.parseInt(cant) > stock) {
+							setCant(stock.toFixed(0) || "0");
+							return;
+						}
+						if (Number.parseInt(cant) > 0 && Number.parseInt(cant) <= stock) {
+							cartViMo.updateCantToBuy(props.book, Number.parseInt(cant));
+							props.cantUpdater(Number.parseInt(cant));
+						}
 						props.setModalVisibility(false);
-					} else setCant(stock.toFixed(0) || "0");
+					}
 				}}
 			>
 				Confirmar

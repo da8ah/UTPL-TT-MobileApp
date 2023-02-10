@@ -69,7 +69,7 @@ const SignInHeader = () => {
 					accessoryLeft={CloseIcon}
 					style={{ borderRadius: 100 }}
 					onPress={() => {
-						navigation.goBack();
+						navigation.navigate("Profile");
 					}}
 				/>
 				<Text category="h1" status="info" style={{ fontStyle: "italic" }}>
@@ -148,7 +148,7 @@ const SignInBody = () => {
 						accessoryRight={ButtonIcon}
 						onPress={async () => {
 							await clientViMo.login(new Client(user?.trim(), undefined, undefined, undefined, password));
-							if (clientViMo.isAuth()) navigation.navigate("Profile");
+							if (clientViMo.isAuth()) navigation.goBack();
 						}}
 					>
 						INICIAR SESIÓN

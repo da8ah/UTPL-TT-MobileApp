@@ -3,7 +3,7 @@ import Cart from "../core/entities/Cart";
 import StockBook from "../core/entities/StockBook";
 import ToBuyBook from "../core/entities/ToBuyBook";
 
-export type CartObserver = (cart?: Cart) => void;
+export type CartObserver = (cart: Cart) => void;
 export class CartViMo {
 	private observer: CartObserver | null = null;
 	private repository: ServerDataSource | null = serverDataSource;
@@ -24,7 +24,21 @@ export class CartViMo {
 	}
 
 	public addBookToCart(stockBook: StockBook, cant: number) {
-		if (this.books.includes(stockBook)) return;
+		// Verify if book already exists
+		let found = false;
+		this.books.forEach((book) => {
+			if (!found) found = book.getIsbn() === stockBook.getIsbn();
+		});
+
+		// If exists update cant
+		if (found) {
+			this.cart.getToBuyBooks()?.forEach((book) => {
+				if (book.getIsbn() === stockBook.getIsbn()) book.setCant(cant);
+			});
+			return;
+		}
+
+		// If not exists then add
 		this.books.push(stockBook);
 		const toAdd: ToBuyBook = new ToBuyBook(
 			stockBook.getIsbn(),
@@ -41,12 +55,18 @@ export class CartViMo {
 		this.cart.addToBuyBook(toAdd);
 	}
 
-	public getAvailableStock(toBuyBook?: ToBuyBook) {
-		// const index = this.cart.getToBuyBooks()?.indexOf(toBuyBook);
-		// if (this.books && index)
-		//return this.books[index].getStock();
-		// console.log(this.books[index].getStock());
-		console.log(this.books);
+	public updateCantToBuy(toBuyBook: ToBuyBook, cant: number) {
+		const books = this.cart.getToBuyBooks();
+		if (books === undefined) return;
+		const index = books.indexOf(toBuyBook);
+		if (index !== undefined) books[index].setCant(cant);
+		this.cart.calculate();
+		if (this.observer) this.observer(this.cart);
+	}
+
+	public getAvailableStock(toBuyBook: ToBuyBook) {
+		const index = this.cart.getToBuyBooks()?.indexOf(toBuyBook);
+		if (this.books && index !== undefined) return this.books[index].getStock();
 	}
 
 	public getBookByIndex(index: number) {

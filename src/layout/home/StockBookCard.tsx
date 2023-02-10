@@ -148,10 +148,16 @@ const ModalCant = (props: { stock?: number; cantUpdater: (cant: string) => void;
 				size="small"
 				style={{ width: "50%" }}
 				onPress={() => {
-					if (props?.stock && Number.parseInt(cant) <= props?.stock) {
-						props.cantUpdater(cant);
+					if (props?.stock) {
+						if (Number.parseInt(cant) > props?.stock) {
+							setCant(props?.stock.toFixed(0) || "0");
+							return;
+						}
+						if (Number.parseInt(cant) > 0 && Number.parseInt(cant) <= props.stock) {
+							props.cantUpdater(cant);
+						}
 						props.setModalVisibility(false);
-					} else setCant(props.stock?.toFixed(0) || "0");
+					}
 				}}
 			>
 				Confirmar

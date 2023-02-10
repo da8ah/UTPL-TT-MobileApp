@@ -2,7 +2,7 @@ import { Layout, List, Text } from "@ui-kitten/components";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import Cart from "../../core/entities/Cart";
-import cartViMo from "../../viewmodel/CartViMo";
+import cartViMo, { CartObserver } from "../../viewmodel/CartViMo";
 import CartItem from "./CartItem";
 
 const styles = StyleSheet.create({
@@ -18,20 +18,34 @@ const styles = StyleSheet.create({
 	cartStatus: { flex: 3, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
 	cartBooks: { flex: 17 },
 	button: {},
-	statusLayouts: { alignItems: "center" },
+	statusLayouts: { backgroundColor: "transparent", alignItems: "center", paddingVertical: 5 },
 	statusProperties: { textAlign: "center", fontSize: 12, fontWeight: "bold" },
 });
 
 const CartScreen = (props: { closeButton?: JSX.Element; orderButton?: JSX.Element }) => {
-	const [cart] = useState<Cart>(cartViMo.getCart());
-	// const fecha = new Intl.DateTimeFormat("ec", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date());
-	const fecha = new Date().toDateString();
-	const descuento = cart?.getDiscountCalc() || 0;
-	const iva = cart?.getIvaCalc() || 0;
-	const subtotal = cart?.getSubtotal() || 0;
-	const total = cart?.getTotalPrice() || 0;
+	const [cart, setCart] = useState<Cart>(cartViMo.getCart());
+	const [books, setBooks] = useState(cart.getToBuyBooks());
+	const [descuento, setDescuento] = useState(cart?.getDiscountCalc() || 0);
+	const [iva, setIva] = useState(cart?.getIvaCalc() || 0);
+	const [subtotal, setSubtotal] = useState(cart?.getSubtotal() || 0);
+	const [total, setTotal] = useState(cart?.getTotalPrice() || 0);
+	const fecha = new Date().toLocaleDateString("ec");
 
-	useEffect(() => {}, [cart, fecha, descuento, iva, subtotal, total]);
+	useEffect(() => {}, [cart, books, fecha, descuento, iva, subtotal, total]);
+
+	const updateCart: CartObserver = (cart: Cart) => {
+		setCart(cart);
+		setBooks(cart.getToBuyBooks());
+		setDescuento(cart?.getDiscountCalc() || 0);
+		setIva(cart?.getIvaCalc() || 0);
+		setSubtotal(cart?.getSubtotal() || 0);
+		setTotal(cart?.getTotalPrice() || 0);
+	};
+
+	useEffect(() => {
+		cartViMo.attach(updateCart);
+		return () => cartViMo.detach();
+	}, []);
 
 	// render
 	return (
@@ -43,36 +57,29 @@ const CartScreen = (props: { closeButton?: JSX.Element; orderButton?: JSX.Elemen
 				{props.closeButton}
 			</Layout>
 			<Layout style={styles.cartStatus}>
-				<Layout style={{ width: "30%", alignItems: "center" }}>
+				<Layout style={[styles.statusLayouts, { width: "20%" }]}>
 					<Text style={{ fontWeight: "bold" }}>Fecha</Text>
 					<Text>{fecha}</Text>
 				</Layout>
 				<Layout style={[styles.statusLayouts]}>
-					<Text style={[styles.statusProperties]}>Descuento</Text>
-					<Text style={[styles.statusProperties, { color: "mediumspringgreen", fontSize: 13 }]}>-{descuento.toFixed(2)}</Text>
+					<Text style={[styles.statusProperties]}>Subtotal</Text>
+					<Text style={[styles.statusProperties, { fontSize: 13 }]}>{subtotal.toFixed(2)}</Text>
 				</Layout>
 				<Layout style={[styles.statusLayouts]}>
 					<Text style={[styles.statusProperties]}>IVA</Text>
 					<Text style={[styles.statusProperties, { color: "darkred" }]}>+{iva.toFixed(2)}</Text>
 				</Layout>
 				<Layout style={[styles.statusLayouts]}>
-					<Text style={[styles.statusProperties]}>Subtotal</Text>
-					<Text style={[styles.statusProperties]}>{subtotal.toFixed(2)}</Text>
+					<Text style={[styles.statusProperties]}>Descuento</Text>
+					<Text style={[styles.statusProperties, { color: "darkgreen" }]}>-{descuento.toFixed(2)}</Text>
 				</Layout>
-				<Layout style={[styles.statusLayouts, { width: "20%" }]}>
+				<Layout style={[styles.statusLayouts, { backgroundColor: "orange", width: "25%", borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }]}>
 					<Text style={[styles.statusProperties, { width: "100%", fontSize: 18 }]}>TOTAL</Text>
-					<Text style={[styles.statusProperties, { width: "100%", fontSize: 18, textAlign: "left" }]}>$ {total.toFixed(2)}</Text>
+					<Text style={[styles.statusProperties, { width: "100%", fontSize: 18 }]}>$ {total.toFixed(2)}</Text>
 				</Layout>
 			</Layout>
 			<Layout style={styles.cartBooks}>
-				<List
-					scrollEnabled
-					listKey={"cart"}
-					initialNumToRender={5}
-					data={cart?.getToBuyBooks()}
-					extraData={cart?.getToBuyBooks()}
-					renderItem={CartItem}
-				/>
+				<List scrollEnabled listKey={"cart"} initialNumToRender={5} data={books} extraData={books} renderItem={CartItem} />
 			</Layout>
 			{props.orderButton}
 		</Layout>

@@ -62,4 +62,8 @@ export default class ToBuyBook extends Book {
 	public getPriceCalcPerUnit(): number | undefined {
 		return this.priceCalcPerUnit;
 	}
+
+	public setCant(cant: number) {
+		this.cant = cant;
+	}
 }

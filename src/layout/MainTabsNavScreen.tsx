@@ -62,19 +62,21 @@ const MainTabsNavScreen = () => {
 		/>
 	);
 
-	const ButtonIconRight = () => <Icon name="arrow-circle-right-outline" fill="white" height="20" width="20" />;
+	const ButtonIconLeft = () => <Icon name="shopping-cart" fill="white" height="25" width="25" />;
+	const ButtonIconRight = () => <Icon name="arrow-circle-right-outline" fill="white" height="25" width="25" />;
 	const OrderBottomSheetButton = () => (
 		<Button
 			size="large"
 			status="warning"
 			style={styles.button}
+			accessoryLeft={ButtonIconLeft}
 			accessoryRight={ButtonIconRight}
 			onPress={() => {
 				navigation.navigate(clientViMo.isAuth() ? "Order" : "SignIn");
 				handleCloseModalPress();
 			}}
 		>
-			Ir a Caja
+			Ir a CAJA
 		</Button>
 	);
 
