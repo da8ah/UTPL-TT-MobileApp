@@ -1,13 +1,8 @@
-import BottomSheet, { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
-import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-import { useNavigation } from "@react-navigation/native";
-import { Button, Icon, Layout, List, Text } from "@ui-kitten/components";
-import { useCallback, useMemo, useRef } from "react";
+import { Layout, List, Text } from "@ui-kitten/components";
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import StockBook from "../../core/entities/StockBook";
-import ToBuyBook from "../../core/entities/ToBuyBook";
-import clientViMo from "../../viewmodel/ClientViMo";
-import { RootStackParamList } from "../NavigationTypes";
+import Cart from "../../core/entities/Cart";
+import cartViMo from "../../viewmodel/CartViMo";
 import CartItem from "./CartItem";
 
 const styles = StyleSheet.create({
@@ -27,28 +22,17 @@ const styles = StyleSheet.create({
 	statusProperties: { textAlign: "center", fontSize: 12, fontWeight: "bold" },
 });
 
-const books = [
-	new ToBuyBook(),
-	new ToBuyBook(),
-	new ToBuyBook(),
-	new ToBuyBook(),
-	new ToBuyBook(),
-	new ToBuyBook(),
-	new ToBuyBook(),
-	new ToBuyBook(),
-	new ToBuyBook(),
-	new ToBuyBook(),
-];
-
-const CartScreen = (props: { closeButton?: JSX.Element }) => {
+const CartScreen = (props: { closeButton?: JSX.Element; orderButton?: JSX.Element }) => {
+	const [cart] = useState<Cart>(cartViMo.getCart());
 	// const fecha = new Intl.DateTimeFormat("ec", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date());
 	const fecha = new Date().toDateString();
-	const descuento = 10;
-	const iva = 4.34;
-	const subtotal = 23.66;
-	const total = 200;
+	const descuento = cart?.getDiscountCalc() || 0;
+	const iva = cart?.getIvaCalc() || 0;
+	const subtotal = cart?.getSubtotal() || 0;
+	const total = cart?.getTotalPrice() || 0;
 
-	const ButtonIcon = () => <Icon name="settings-2-outline" fill="white" height="20" width="20" />;
+	useEffect(() => {}, [cart, fecha, descuento, iva, subtotal, total]);
+
 	// render
 	return (
 		<Layout style={{ flex: 1 }}>
@@ -83,30 +67,14 @@ const CartScreen = (props: { closeButton?: JSX.Element }) => {
 			<Layout style={styles.cartBooks}>
 				<List
 					scrollEnabled
-					// testID='listBooks'
-					// listKey={"books"}
-					// style={styles.mainListLayout}
-					// contentContainerStyle={styles.flatListLayout}
+					listKey={"cart"}
 					initialNumToRender={5}
-					data={books}
-					extraData={books}
+					data={cart?.getToBuyBooks()}
+					extraData={cart?.getToBuyBooks()}
 					renderItem={CartItem}
-					// refreshing={refreshing}
-					// onRefresh={queryDataFromServer}
 				/>
 			</Layout>
-			<Button
-				size="large"
-				status="warning"
-				style={styles.button}
-				accessoryLeft={ButtonIcon}
-				onPress={() => {
-					// props.closeBottomSheet();
-					// navigation.navigate(clientViMo.isAuth() ? "Order" : "SignIn");
-				}}
-			>
-				PROCESAR
-			</Button>
+			{props.orderButton}
 		</Layout>
 	);
 };

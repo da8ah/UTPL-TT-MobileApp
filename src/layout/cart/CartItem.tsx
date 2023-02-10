@@ -1,8 +1,9 @@
 import { Button, Input, Layout, Modal, Text } from "@ui-kitten/components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, ListRenderItem, ListRenderItemInfo, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import StockBook from "../../core/entities/StockBook";
 import ToBuyBook from "../../core/entities/ToBuyBook";
+import cartViMo, { CartObserver } from "../../viewmodel/CartViMo";
 
 const transparent = "transparent";
 const styles = StyleSheet.create({
@@ -32,17 +33,16 @@ const styles = StyleSheet.create({
 
 const CartItem: ListRenderItem<ToBuyBook> = (info: ListRenderItemInfo<ToBuyBook>) => (
 	<Layout style={styles.cardLayout}>
-		<ItemLeftPanel />
-		<ItemCenterPanel />
-		<ItemRightPanel />
+		<ItemLeftPanel book={info.item} />
+		<ItemCenterPanel book={info.item} />
+		<ItemRightPanel book={info.item} />
 	</Layout>
 );
 
 export default CartItem;
 
-const ItemLeftPanel = () => {
-	const author = "HIRR SEBASTIAN";
-	const title = "En busca de TOTORO";
+const ItemLeftPanel = (props: { book: ToBuyBook }) => {
+	const title = props.book.getTitle();
 	return (
 		<Layout style={styles.cardLeft}>
 			<Layout style={styles.imageLayout}>
@@ -54,7 +54,7 @@ const ItemLeftPanel = () => {
 				alwaysBounceHorizontal
 				showsVerticalScrollIndicator={false}
 				fadingEdgeLength={50}
-				contentContainerStyle={{ width: title?.length !== undefined ? (title?.length < 30 ? "100%" : "auto") : "100%" }}
+				contentContainerStyle={{ height: 20 }}
 			>
 				<Text style={{ fontSize: 12, textAlignVertical: "center" }}>{title}</Text>
 			</ScrollView>
@@ -62,15 +62,16 @@ const ItemLeftPanel = () => {
 	);
 };
 
-const ItemCenterPanel = () => {
+const ItemCenterPanel = (props: { book: ToBuyBook }) => {
 	const [modalVisibility, setModalVisibility] = useState(false);
 	const [modalChildren, setModalChildren] = useState<JSX.Element>();
-	const [cant, setCant] = useState("0");
+	const [cant, setCant] = useState(props.book.getCant()?.toFixed(0) || "0");
 
-	const price = 20;
-	const inOffer = true;
-	const itHasIva = true;
-	const discountAmount = 5;
+	const price = props.book.getGrossPricePerUnit() || 0;
+	const inOffer = props.book.isInOffer();
+	const itHasIva = props.book.itHasIva();
+	const discountAmount = props.book.getDiscountedAmount() || 0;
+
 	return (
 		<Layout style={[styles.common, styles.cardCenter]}>
 			<Layout style={{ backgroundColor: transparent, width: "100%", flexDirection: "row", justifyContent: "space-around" }}>
@@ -91,11 +92,12 @@ const ItemCenterPanel = () => {
 					<TouchableOpacity
 						style={{ backgroundColor: "royalblue", height: 20, width: 20, borderRadius: 100, justifyContent: "center", alignItems: "center" }}
 						onPressIn={() => {
-							setModalChildren(<ModalCant cantUpdater={setCant} />);
+							cartViMo.getAvailableStock();
+							setModalChildren(<ModalCant book={props.book} cantUpdater={setCant} setModalVisibility={setModalVisibility} />);
 							setModalVisibility(true);
 						}}
 					>
-						<Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>1</Text>
+						<Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>{cant}</Text>
 					</TouchableOpacity>
 				</Layout>
 			</Layout>
@@ -110,8 +112,8 @@ const ItemCenterPanel = () => {
 	);
 };
 
-const ItemRightPanel = () => {
-	const totalPrice = 40;
+const ItemRightPanel = (props: { book: ToBuyBook }) => {
+	const totalPrice = props.book.getPriceCalcPerUnit() || 0;
 	return (
 		<Layout style={[styles.common, styles.cardRight]}>
 			<Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>💲{totalPrice.toFixed(2)}</Text>
@@ -119,14 +121,21 @@ const ItemRightPanel = () => {
 	);
 };
 
-const ModalCant = (props: { cantUpdater: (cant: string) => void }) => {
+const ModalCant = (props: { book: ToBuyBook; cantUpdater: (cant: string) => void; setModalVisibility: (value: boolean) => void }) => {
 	const [cant, setCant] = useState("0");
+	// const [stock, setStock] = useState(cartViMo.getAvailableStock(props.book) || 0);
+	const stock = 0;
+	useEffect(() => {
+		// setStock(cartViMo.getAvailableStock(props.book) || 0);
+	}, []);
 
 	return (
 		<Layout style={{ alignItems: "center", padding: 20, borderRadius: 20 }}>
 			<Layout style={{ flexDirection: "row", justifyContent: "center" }}>
-				<Text style={{ textAlign: "right" }}>Cantidad de Artículos</Text>
-				<Text style={{ width: "20%", textAlign: "center" }}>{Number(cant) !== 0 ? cant : "0"}</Text>
+				<Text style={{ textAlign: "right" }}>Cantidad de Artículos </Text>
+				<Text style={{ width: "20%", textAlign: "center" }}>
+					{Number(cant) !== 0 ? cant : "0"}/{stock?.toFixed(0)}
+				</Text>
 			</Layout>
 			<Layout style={{ marginVertical: 20 }}>
 				<Input
@@ -138,7 +147,7 @@ const ModalCant = (props: { cantUpdater: (cant: string) => void }) => {
 					defaultValue={cant}
 					value={cant}
 					onChangeText={(newCant) => {
-						const pattern = /^\d{0,1}$/;
+						const pattern = /^\d{0,2}$/;
 						if (!Number.isNaN(Number(newCant)) && new RegExp(pattern).test(newCant)) setCant(newCant);
 					}}
 				/>
@@ -147,13 +156,10 @@ const ModalCant = (props: { cantUpdater: (cant: string) => void }) => {
 				size="small"
 				style={{ width: "50%" }}
 				onPress={() => {
-					// const parse = Number(cant);
-					// if (!Number.isNaN(parse)) {
-					// 	props.setStock(parse);
-					// 	props.book.setStock(parse);
-					// 	newStockBookViMo.updateDraft(props.book);
-					// 	props.setModalVisibility(false);
-					// }
+					if (stock && Number.parseInt(cant) <= stock) {
+						props.cantUpdater(cant);
+						props.setModalVisibility(false);
+					} else setCant(stock.toFixed(0) || "0");
 				}}
 			>
 				Confirmar

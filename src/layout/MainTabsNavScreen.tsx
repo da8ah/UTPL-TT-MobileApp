@@ -37,6 +37,9 @@ const styles = StyleSheet.create({
 });
 
 const MainTabsNavScreen = () => {
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const navigation: any = useNavigation<RootStackParamList>();
+
 	// BottomSheet
 	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 	// callbacks
@@ -59,12 +62,28 @@ const MainTabsNavScreen = () => {
 		/>
 	);
 
+	const ButtonIconRight = () => <Icon name="arrow-circle-right-outline" fill="white" height="20" width="20" />;
+	const OrderBottomSheetButton = () => (
+		<Button
+			size="large"
+			status="warning"
+			style={styles.button}
+			accessoryRight={ButtonIconRight}
+			onPress={() => {
+				navigation.navigate(clientViMo.isAuth() ? "Order" : "SignIn");
+				handleCloseModalPress();
+			}}
+		>
+			Ir a Caja
+		</Button>
+	);
+
 	return (
 		<Layout style={{ flex: 1, paddingTop: 30 }}>
 			<Header presentBottomSheet={handlePresentModalPress} closeBottomSheet={handleCloseModalPress} />
 			<Body />
 			<BottomSheetModal ref={bottomSheetModalRef} index={0} snapPoints={["80%"]}>
-				<CartScreen closeButton={<CloseBottomSheetButton />} />
+				<CartScreen orderButton={<OrderBottomSheetButton />} closeButton={<CloseBottomSheetButton />} />
 			</BottomSheetModal>
 		</Layout>
 	);

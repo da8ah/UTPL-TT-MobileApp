@@ -1,9 +1,6 @@
-import { List, Text } from "@ui-kitten/components";
-import { Layout } from "@ui-kitten/components";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleProp, StyleSheet, ViewStyle } from "react-native";
+import { Layout, List, Text } from "@ui-kitten/components";
+import { ActivityIndicator, StyleSheet } from "react-native";
 import StockBook from "../../core/entities/StockBook";
-import booksViMo from "../../viewmodel/BooksViMo";
 import StockBookCard from "./StockBookCard";
 
 const styles = StyleSheet.create({

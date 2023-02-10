@@ -65,4 +65,20 @@ export default class Cart {
 	public getToBuyBooks(): ToBuyBook[] | undefined {
 		return this.toBuyBooks;
 	}
+
+	public addToBuyBook(toBuyBook: ToBuyBook): void {
+		if (this.toBuyBooks === undefined) this.toBuyBooks = [];
+		this.toBuyBooks.push(toBuyBook);
+	}
+	public rmToBuyBook(toBuyBook: ToBuyBook): void {
+		if (this.toBuyBooks === undefined) return;
+		if (this.toBuyBooks?.length > 1) {
+			this.toBuyBooks?.concat(
+				this.toBuyBooks?.splice(0, this.toBuyBooks.indexOf(toBuyBook)),
+				this.toBuyBooks?.splice(this.toBuyBooks.indexOf(toBuyBook), this.toBuyBooks.length - 1),
+			);
+		} else {
+			this.toBuyBooks = [];
+		}
+	}
 }
