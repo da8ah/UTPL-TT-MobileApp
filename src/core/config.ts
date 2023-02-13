@@ -8,6 +8,7 @@ const config = {
 	},
 	LSS: {
 		AUTH_KEY: "authTokenSaved",
+		STRIPE_KEY: "paymentKeySaved",
 	},
 };
 

@@ -1,19 +1,20 @@
+import clientViMo from "../../../viewmodel/ClientViMo";
+import { ServerDataSource } from "../../data/ServerDataSource";
+import Cart from "../../entities/Cart";
 import Client from "../../entities/Client";
-import IPersistenciaTransacciones from "../../ports/persistencia/IPersistenciaTransacciones";
 
 export default class TransaccionesDelClient {
-	public static async listarTodasLasTransacciones(repository: AbstractRepository): Promise<CardTransaction[] | null> {
-		const repo = repository as ServerDataSource;
-		repo.setStrategy(new PersistenciaDeTransacciones());
-		const data = <CardTransaction[]>await repo.downloadBooks();
-		if (!data) return null;
-		return data;
-	}
-	public async registrarTransaccion(client: Client, iPersistenciaTransacciones: IPersistenciaTransacciones): Promise<Client> {
-		return await iPersistenciaTransacciones.guardarNuevaTransaccion(client);
+	public static async registrarTransaccion(cart: Cart, repository: ServerDataSource): Promise<string | null> {
+		try {
+			const resultado = <string>await repository.saveTransaction({ token: clientViMo.getJWT(), client: clientViMo.getClient(), cart });
+			return resultado;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
 	}
 
-	public async listarMisTransacciones(client: Client, iPersistenciaTransacciones: IPersistenciaTransacciones): Promise<Client> {
-		return await iPersistenciaTransacciones.obtenerTransacciones(client);
+	public async listarMisTransacciones(client: Client): Promise<Client> {
+		throw new Error("Method not implemented.");
 	}
 }

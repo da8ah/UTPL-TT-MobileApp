@@ -1,5 +1,5 @@
 import { Button, Input, Layout, Modal, Text } from "@ui-kitten/components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, ListRenderItem, ListRenderItemInfo, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import ToBuyBook from "../../core/entities/ToBuyBook";
 import cartViMo from "../../viewmodel/CartViMo";
@@ -36,6 +36,8 @@ export default CartItem;
 const CardToBuyBook = (props: { book: ToBuyBook; index: number }) => {
 	const [bcc, setBcc] = useState("palegoldenrod");
 	const [cant, setCant] = useState(props.book.getCant() || 0);
+
+	useEffect(() => {}, [cant]);
 
 	return (
 		<TouchableOpacity

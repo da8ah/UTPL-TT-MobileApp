@@ -35,14 +35,14 @@ const CartScreen = (props: { closeButton?: JSX.Element; orderButton?: JSX.Elemen
 
 	useEffect(() => {}, [cart, books, fecha, descuento, iva, subtotal, total]);
 
-	const updateCart: CartObserver = (cart: Cart) => {
+	const updateCart: CartObserver = (cartToUpdate: Cart) => {
 		setRefreshing(true);
-		setCart(cart);
-		setBooks(cart.getToBuyBooks());
-		setDescuento(cart?.getDiscountCalc() || 0);
-		setIva(cart?.getIvaCalc() || 0);
-		setSubtotal(cart?.getSubtotal() || 0);
-		setTotal(cart?.getTotalPrice() || 0);
+		setCart(cartToUpdate);
+		setBooks(cartToUpdate?.getToBuyBooks());
+		setDescuento(cartToUpdate?.getDiscountCalc() || 0);
+		setIva(cartToUpdate?.getIvaCalc() || 0);
+		setSubtotal(cartToUpdate?.getSubtotal() || 0);
+		setTotal(cartToUpdate?.getTotalPrice() || 0);
 		setRefreshing(false);
 	};
 
@@ -83,7 +83,7 @@ const CartScreen = (props: { closeButton?: JSX.Element; orderButton?: JSX.Elemen
 				</Layout>
 			</Layout>
 			<Layout style={styles.cartBooks}>
-				<List scrollEnabled listKey={"cart"} initialNumToRender={5} data={books} extraData={books} renderItem={CartItem} refreshing={refreshing} />
+				<List scrollEnabled listKey={"cart"} data={books} extraData={books} renderItem={CartItem} refreshing={refreshing} />
 			</Layout>
 			{props.orderButton}
 		</Layout>

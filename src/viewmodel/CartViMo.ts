@@ -2,6 +2,8 @@ import serverDataSource, { ServerDataSource } from "../core/data/ServerDataSourc
 import Cart from "../core/entities/Cart";
 import StockBook from "../core/entities/StockBook";
 import ToBuyBook from "../core/entities/ToBuyBook";
+import CarritoDelClient from "../core/usecases/client/CarritoDelClient";
+import TransaccionesDelClient from "../core/usecases/client/TransaccionesDelClient";
 
 export type CartObserver = (cart: Cart) => void;
 export class CartViMo {
@@ -10,6 +12,11 @@ export class CartViMo {
 	private cart: Cart = new Cart();
 	private books: StockBook[] = [];
 	private callFromCart = false;
+	private spk: string | null = null;
+
+	public getSPK() {
+		return this.spk;
+	}
 
 	public wasCalledFromCart() {
 		return this.callFromCart;
@@ -26,7 +33,6 @@ export class CartViMo {
 	public attach(observer: CartObserver) {
 		this.observer = observer;
 	}
-
 	public detach() {
 		this.observer = null;
 	}
@@ -84,10 +90,26 @@ export class CartViMo {
 		if (this.books && index !== undefined) return this.books[index].getStock();
 	}
 
-	public getBookByIndex(index: number) {
-		const books = this.cart?.getToBuyBooks();
-		if (books === undefined) return;
-		return books[index];
+	public async queryPublishableKey() {
+		let credenciales;
+		if (this.repository) credenciales = await CarritoDelClient.obtenerCredencialesDePago(this.repository);
+		if (credenciales) this.spk = credenciales;
+	}
+
+	public async sendPaymentToServer() {
+		if (!this.repository) return null;
+		return await CarritoDelClient.realizarPago(this.cart, this.repository);
+	}
+
+	public async sendTransactionToServer() {
+		if (!this.repository) return null;
+		const resultado = await TransaccionesDelClient.registrarTransaccion(this.cart, this.repository);
+		if (resultado) {
+			this.books = [];
+			this.cart = new Cart();
+		}
+		if (this.observer && this.cart) this.observer(this.getCart());
+		return resultado;
 	}
 }
 

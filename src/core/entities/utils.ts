@@ -1,9 +1,7 @@
 import BillingInfo from "./BillingInfo";
-import CardTransaction from "./CardTransaction";
 import Cart from "./Cart";
 import Client from "./Client";
 import StockBook from "./StockBook";
-import ToBuyBook from "./ToBuyBook";
 import User from "./User";
 
 export type IStockBook = {
@@ -138,35 +136,59 @@ export type ICardTransaction = {
 };
 
 export class TransactionConverter {
-	public static jsonToBook(res: ICardTransaction): CardTransaction {
-		// All Attrs from body
-		const { id, date, payment, change, cart } = res;
+	public static CardTransactionToJSON(client: Client, cart: Cart) {
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		let json: any = {};
+		if (client.getUser() !== undefined) json["user"] = client.getUser()?.toLowerCase();
+		if (client.getName() !== undefined) json["name"] = client.getName();
+		if (client.getEmail() !== undefined) json["email"] = client.getEmail();
+		if (client.getMobile() !== undefined) json["mobile"] = client.getMobile();
 
-		if (cart !== undefined) {
-			const { discountCalc, ivaCalc, subtotal, totalPrice, toBuyBooks } = cart;
-
-			if (toBuyBooks !== undefined) {
-				// NewStockBook with all Attrs
-				const newToBuyBooksArray = toBuyBooks.map(
-					(item: IToBuyBook) =>
-						new ToBuyBook(
-							item.isbn,
-							item.imgRef,
-							item.title,
-							item.author,
-							item.releaseDate,
-							item.grossPricePerUnit,
-							item.inOffer,
-							item.discountPercentage,
-							item.hasIva,
-							item.cant,
-						),
-				);
-				const newCart = new Cart(discountCalc, ivaCalc, subtotal, totalPrice, newToBuyBooksArray);
-				return new CardTransaction(id, date, payment, change, newCart);
-			}
+		const cards = client.getCards();
+		let cardUsed;
+		if (cards?.length === 1) {
+			cardUsed = { ownerName: cards[0].getOwnerName(), cardNumber: cards[0].getCardNumber(), expiryDate: cards[0].getExpiryDate() };
+			json["cards"] = [cardUsed];
 		}
-		return new CardTransaction();
+
+		const books = cart.getToBuyBooks()?.map((book) => {
+			return JSON.parse(
+				JSON.stringify({
+					isbn: book.getIsbn(),
+					imgRef: book.getImgRef(),
+					title: book.getTitle(),
+					author: book.getAuthor(),
+					releaseDate: book.getReleaseDate(),
+					grossPricePerUnit: book.getGrossPricePerUnit(),
+					inOffer: book.isInOffer(),
+					discountPercentage: book.getDiscountPercentage(),
+					hasIva: book.itHasIva(),
+					ivaPercentage: book.getIvaPercentage(),
+					discountedAmount: book.getDiscountedAmount(),
+					ivaAmount: book.getIvaAmount(),
+					priceWithDiscount: book.getPriceWithDiscount(),
+					priceWithIva: book.getPriceWithIva(),
+					cant: book.getCant(),
+					priceCalcPerUnit: book.getPriceCalcPerUnit(),
+				}),
+			);
+		});
+
+		const cartBought = {
+			discountCalc: cart.getDiscountCalc()?.toFixed(2),
+			ivaCalc: cart.getIvaCalc()?.toFixed(2),
+			subtotal: cart.getSubtotal()?.toFixed(2),
+			totalPrice: cart.getTotalPrice()?.toFixed(2),
+			toBuyBooks: books,
+		};
+
+		json["transactions"] = {
+			date: new Date(Date.now()),
+			payment: cart.getTotalPrice()?.toFixed(2),
+			change: 0,
+			cart: { ...cartBought },
+		};
+		return JSON.stringify(json);
 	}
 }
 

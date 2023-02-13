@@ -1,8 +1,9 @@
 import config from "../config";
 import BillingInfo from "../entities/BillingInfo";
+import Cart from "../entities/Cart";
 import Client from "../entities/Client";
 import StockBook from "../entities/StockBook";
-import { BookConverter, ClientConverter, InputValidator, IStockBook } from "../entities/utils";
+import { BookConverter, ClientConverter, InputValidator, IStockBook, TransactionConverter } from "../entities/utils";
 
 export class ServerDataSource {
 	private static repository: ServerDataSource | null = null;
@@ -74,6 +75,7 @@ export class ServerDataSource {
 				await fetch(authURL, httpContent)
 					.then((res) => {
 						token = res.headers.get("set-cookie")?.split(";")[0].split("=")[1];
+						res.headers.delete("set-cookie");
 						return res.json();
 					})
 					.then((body) => (client = ClientConverter.jsonToClient(body)));
@@ -105,6 +107,90 @@ export class ServerDataSource {
 	}
 
 	// TRANSACTIONS
+	public async queryPaymentKey(data: { token: string | null }): Promise<string | null> {
+		if (!(this.apiURL || data.token)) return null;
+		try {
+			if (data.token) {
+				const httpContent = {
+					method: "GET",
+					headers: {
+						Authorization: data.token,
+					},
+				};
+				return await fetch(`${this.apiURL}/clients/payments`, httpContent).then((res) => {
+					const spk = res.headers.get("set-cookie")?.split(";")[0].split("=")[1];
+					res.headers.delete("set-cookie");
+					return spk || null;
+				});
+			}
+			return null;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	}
+
+	public async sendPayment(data: { token: string | null; price: string }): Promise<{
+		codeStatus: string;
+		clientSecret: string | null;
+	} | null> {
+		if (!(this.apiURL || data.token)) return null;
+		try {
+			if (data.token) {
+				const checkPaymentFormat = (price: string): boolean => {
+					const priceRegEx: RegExp = /^[\d]+[.,]{1}[\d]{2}$/;
+					let priceTrim = price.trim();
+					return priceRegEx.test(priceTrim);
+				};
+				if (!checkPaymentFormat(data.price)) return { codeStatus: ":400", clientSecret: null };
+				const priceSplitted = data.price.split(/[.,]{1}/);
+				const priceWithStripeFormat = priceSplitted[0] + priceSplitted[1];
+				const bodyContent = JSON.stringify({
+					amount: `${priceWithStripeFormat}`,
+					paymentMethodType: "card",
+				});
+				const httpContent = {
+					method: "POST",
+					headers: {
+						Authorization: data.token,
+						"Content-Type": "application/json",
+					},
+					body: bodyContent,
+				};
+				const resultado = await fetch(`${this.apiURL}/clients/payments`, httpContent).then(async (res) => {
+					const clientSecret = await res.json().then((obj) => obj.clientSecret);
+					return { codeStatus: res.status.toString(), clientSecret };
+				});
+				return resultado;
+			}
+			return null;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	}
+
+	public async saveTransaction(data: { token: string | null; client: Client; cart: Cart }): Promise<string | null> {
+		if (!(this.apiURL || data.token)) return null;
+		try {
+			if (data.token) {
+				const bodyContent = TransactionConverter.CardTransactionToJSON(data.client, data.cart);
+				const httpContent = {
+					method: "POST",
+					headers: {
+						Authorization: data.token,
+						"Content-Type": "application/json",
+					},
+					body: bodyContent,
+				};
+				return await fetch(`${this.apiURL}/clients/transactions`, httpContent).then((res) => res.status.toString());
+			}
+			return null;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	}
 }
 
 export default ServerDataSource.getInstance();
