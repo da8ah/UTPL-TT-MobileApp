@@ -15,6 +15,7 @@ web-build/
 
 # Env
 .vscode/
+tools/
 .env
 globalConfig.json
 rome.json
