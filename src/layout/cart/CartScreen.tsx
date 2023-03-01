@@ -9,14 +9,14 @@ const styles = StyleSheet.create({
 	container: { flex: 1, padding: 24, justifyContent: "center", backgroundColor: "grey" },
 	cartHeader: {
 		backgroundColor: "black",
-		flex: 2,
+		flex: 4,
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
 		paddingHorizontal: 20,
 	},
-	cartStatus: { flex: 3, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-	cartBooks: { flex: 17 },
+	cartStatus: { flex: 6, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+	cartBooks: { flex: 25 },
 	button: {},
 	statusLayouts: { backgroundColor: "transparent", alignItems: "center", paddingVertical: 5 },
 	statusProperties: { textAlign: "center", fontSize: 12, fontWeight: "bold" },
@@ -83,7 +83,7 @@ const CartScreen = (props: { closeButton?: JSX.Element; orderButton?: JSX.Elemen
 				</Layout>
 			</Layout>
 			<Layout style={styles.cartBooks}>
-				<List scrollEnabled listKey={"cart"} data={books} extraData={books} renderItem={CartItem} refreshing={refreshing} />
+				<List scrollEnabled data={books} extraData={books} renderItem={CartItem} refreshing={refreshing} />
 			</Layout>
 			{props.orderButton}
 		</Layout>

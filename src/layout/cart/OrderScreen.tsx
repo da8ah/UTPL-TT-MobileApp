@@ -52,7 +52,6 @@ const OrderScreen = () => {
 
 	useEffect(() => {
 		tryToGetKey();
-		return () => setPublishableKey(null);
 	}, []);
 
 	return (
@@ -63,7 +62,7 @@ const OrderScreen = () => {
 					<ActivityIndicator />
 				</Layout>
 			) : (
-				<StripeProvider publishableKey={publishableKey}>
+				<StripeProvider key={"stripe"} publishableKey={publishableKey}>
 					<OrderStatus />
 					<OrderBody setModalVisibility={setModalVisibility} setModalChildren={setModalChildren} />
 				</StripeProvider>

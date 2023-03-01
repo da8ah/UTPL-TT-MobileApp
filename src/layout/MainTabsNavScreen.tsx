@@ -89,7 +89,7 @@ const MainTabsNavScreen = () => {
 		<Layout style={{ flex: 1, paddingTop: 30 }}>
 			<Header presentBottomSheet={handlePresentModalPress} closeBottomSheet={handleCloseModalPress} />
 			<Body />
-			<BottomSheetModal ref={bottomSheetModalRef} index={0} snapPoints={["80%"]}>
+			<BottomSheetModal ref={bottomSheetModalRef} index={0} snapPoints={["79%"]}>
 				<CartScreen orderButton={<OrderBottomSheetButton />} closeButton={<CloseBottomSheetButton />} />
 			</BottomSheetModal>
 		</Layout>

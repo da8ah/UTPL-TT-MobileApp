@@ -13,6 +13,7 @@
     "preview": {
       "distribution": "internal",
       "android": {
+        "image": "latest",
         "buildType": "apk"
       },
       "ios": {
