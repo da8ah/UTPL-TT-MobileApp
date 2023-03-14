@@ -1,12 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
-import { BillingDetails, CardForm, CardFormView, StripeProvider, useConfirmPayment } from "@stripe/stripe-react-native";
-import { Button, Icon, Layout, Modal, Text } from "@ui-kitten/components";
+import { BillingDetails, CardField, StripeProvider, useConfirmPayment } from "@stripe/stripe-react-native";
+import { Details } from "@stripe/stripe-react-native/lib/typescript/src/types/components/CardFieldInput";
+import { Button, Icon, Layout, List, Modal, Text } from "@ui-kitten/components";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, ScrollView, StyleSheet } from "react-native";
 import Card from "../../core/entities/Card";
 import cartViMo from "../../viewmodel/CartViMo";
 import clientViMo from "../../viewmodel/ClientViMo";
 import { RootStackParamList } from "../NavigationTypes";
+import CartItem from "./CartItem";
 
 const styles = StyleSheet.create({
 	common: {
@@ -23,17 +25,14 @@ const styles = StyleSheet.create({
 		marginTop: 30,
 	},
 	cartStatus: { flex: 1, width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center" },
-	body: { flex: 6, width: "100%", justifyContent: "space-between", paddingVertical: 20 },
+	body: { flex: 4, width: "100%", justifyContent: "space-between" },
 	statusLayouts: { backgroundColor: "transparent", alignItems: "center", paddingVertical: 5 },
 	statusProperties: { textAlign: "center", fontSize: 12, fontWeight: "bold" },
-	paymentCardForm: {
-		height: 300,
+	paymentCardField: {
+		height: 100,
+		paddingHorizontal: 2,
 		alignItems: "center",
 		justifyContent: "center",
-	},
-	paymentCardContent: {
-		backgroundColor: "white",
-		color: "black",
 	},
 });
 
@@ -64,7 +63,7 @@ const OrderScreen = () => {
 			) : (
 				<StripeProvider key={"stripe"} publishableKey={publishableKey}>
 					<OrderStatus />
-					<OrderBody setModalVisibility={setModalVisibility} setModalChildren={setModalChildren} />
+					<OrderFooter setModalVisibility={setModalVisibility} setModalChildren={setModalChildren} />
 				</StripeProvider>
 			)}
 			<Modal visible={modalVisibility} style={{ width: "70%" }} backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }} children={modalChildren} />
@@ -209,7 +208,7 @@ const OrderStatus = () => {
 	);
 };
 
-const OrderBody = (props: { setModalVisibility: (visibility: boolean) => void; setModalChildren: (children: JSX.Element) => void }) => {
+const OrderFooter = (props: { setModalVisibility: (visibility: boolean) => void; setModalChildren: (children: JSX.Element) => void }) => {
 	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	const navigation: any = useNavigation<RootStackParamList>();
 
@@ -217,7 +216,7 @@ const OrderBody = (props: { setModalVisibility: (visibility: boolean) => void; s
 	const [confirmDisabled, setConfirmDisabledState] = useState<boolean>(true);
 	const { confirmPayment } = useConfirmPayment();
 
-	const validateCardInputs = (cardDetails: CardFormView.Details) => {
+	const validateCardInputs = (cardDetails: Details) => {
 		const postalCode = cardDetails.postalCode;
 		const postalCodeRegEx: RegExp = /^\d{6}$/;
 		if (postalCode) return postalCodeRegEx.test(postalCode);
@@ -228,11 +227,10 @@ const OrderBody = (props: { setModalVisibility: (visibility: boolean) => void; s
 	const LockIcon = () => <Icon name="lock" fill="white" height="30" width="30" />;
 	return (
 		<KeyboardAvoidingView style={styles.body}>
-			<CardForm
+			<CardField
 				autofocus={true}
-				style={styles.paymentCardForm}
-				cardStyle={styles.paymentCardContent}
-				onFormComplete={(cardDetails) => {
+				style={styles.paymentCardField}
+				onCardChange={(cardDetails) => {
 					const completed = cardDetails.complete;
 					if (completed && validateCardInputs(cardDetails)) {
 						setConfirmDisabledState(false);
