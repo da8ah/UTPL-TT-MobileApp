@@ -1,6 +1,6 @@
 {
   "name": "utpl-tt-mobileapp",
-  "version": "0.11.0",
+  "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "npx expo start --tunnel"

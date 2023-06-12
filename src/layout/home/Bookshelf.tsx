@@ -6,6 +6,7 @@ import StockBookCard from "./StockBookCard";
 const styles = StyleSheet.create({
 	shelf: {
 		flex: 1,
+		marginVertical: 20
 	},
 	flatListLayout: {
 		alignItems: "flex-end",
@@ -23,7 +24,7 @@ const Bookshelf = (props: { tag: string; identifier: string; books: StockBook[];
 			<List
 				horizontal
 				scrollEnabled
-				listKey={props.identifier}
+				key={props.identifier}
 				contentContainerStyle={styles.flatListLayout}
 				initialNumToRender={5}
 				data={props.books}

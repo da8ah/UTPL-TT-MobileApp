@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 2,
 		borderBottomColor: "gainsboro",
 	},
-	buttonLayout: { width: "100%", alignItems: "center", marginVertical: 30 },
+	buttonLayout: { width: "100%", alignItems: "center" },
 	button: { width: "70%" },
 });
 
@@ -198,7 +198,7 @@ const SignUpBody = () => {
 				<Icon name="person-add" fill="dimgrey" height="70" width="70" />
 			</Layout>
 			<KeyboardAvoidingView behavior="position" style={[styles.common]}>
-				<Layout style={[styles.common, { display: !isKeyboardActive ? "flex" : "none" }]}>
+				<Layout style={[styles.common, { display: !isKeyboardActive ? "flex" : "none"}]}>
 					<Layout style={styles.inputLayout}>
 						<Layout style={[styles.inputTitle, { borderTopLeftRadius: 10 }]}>
 							<Text adjustsFontSizeToFit style={{ color: "black" }}>
@@ -272,7 +272,7 @@ const SignUpBody = () => {
 						<InputWithPassword password={password} setPassword={setPassword} />
 					</Layout>
 				</Layout>
-				<Layout style={[styles.inputLayout, { marginTop: !isKeyboardActive ? 20 : 2 }]}>
+				<Layout style={[styles.inputLayout, { marginTop: !isKeyboardActive ? 20 : 50 }]}>
 					<Layout style={[styles.inputTitle, { borderTopLeftRadius: 10 }]}>
 						<Text adjustsFontSizeToFit style={{ color: "black", fontSize: 15 }}>
 							Destinatario
@@ -374,7 +374,7 @@ const SignUpBody = () => {
 					/>
 				</Layout>
 			</KeyboardAvoidingView>
-			<Layout style={styles.buttonLayout}>
+			<Layout style={[styles.buttonLayout, {marginVertical: !isKeyboardActive ? 30 : 2}]}>
 				<Button
 					style={styles.button}
 					status="success"

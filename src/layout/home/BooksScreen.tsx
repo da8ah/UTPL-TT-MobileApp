@@ -14,12 +14,13 @@ const styles = StyleSheet.create({
 	},
 	library: {
 		flex: 2,
-		paddingHorizontal: 10,
+		paddingHorizontal: 0,
 		paddingVertical: 4,
 		justifyContent: "space-evenly",
 		alignContent: "center",
 	},
 	flatListLayout: { justifyContent: "center" },
+	items: {justifyContent: "flex-start", marginVertical: 10}
 });
 
 const BooksScreen = () => {
@@ -54,8 +55,9 @@ const BooksScreen = () => {
 				</Layout>
 				<List
 					scrollEnabled
-					listKey={"library"}
+					key={"library"}
 					contentContainerStyle={styles.flatListLayout}
+					columnWrapperStyle={styles.items}
 					initialNumToRender={5}
 					numColumns={3}
 					data={books}
